@@ -18,7 +18,7 @@ public class Contrat {
 
     @Column(name = "date_fin") private LocalDate dateFin;
 
-    @Column(precision = 12, scale = 2) private BigDecimal prime;
+    @Column(nullable = false, precision = 12, scale = 2) private BigDecimal prime;
 
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 32) private StatutContrat statut;
 

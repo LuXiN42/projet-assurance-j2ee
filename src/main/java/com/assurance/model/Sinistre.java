@@ -13,7 +13,7 @@ public class Sinistre {
 
     @Column(nullable = false) private LocalDate date;
 
-    @Column(length = 2000) private String description;
+    @Column(nullable = false, length = 2000) private String description;
 
     @Column(name = "montant_estime", precision = 12, scale = 2) private BigDecimal montantEstime;
 
@@ -29,7 +29,7 @@ public class Sinistre {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "contrat_id", nullable = false) private Contrat contrat;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "client_id", nullable = false) private Utilisateur client;
+    @Transient public Utilisateur getClient() {return contrat != null ? contrat.getClient() : null;}
 
     public Sinistre() {}
     public Long getId(){return id;} public void setId(Long v){id=v;}
@@ -43,5 +43,4 @@ public class Sinistre {
     public String getCommentaires(){return commentaires;} public void setCommentaires(String v){commentaires=v;}
     public BigDecimal getMontantIndemnisation(){return montantIndemnisation;} public void setMontantIndemnisation(BigDecimal v){montantIndemnisation=v;}
     public Contrat getContrat(){return contrat;} public void setContrat(Contrat v){contrat=v;}
-    public Utilisateur getClient(){return client;} public void setClient(Utilisateur v){client=v;}
 }

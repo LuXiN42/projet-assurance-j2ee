@@ -8,7 +8,6 @@
     <property name="hibernate.connection.url"><![CDATA[jdbc:mysql://localhost:3306/assurance_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]]></property>
     <property name="hibernate.connection.username">assurance</property>
     <property name="hibernate.connection.password">assuranceGroupeO</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
     <property name="hibernate.hbm2ddl.auto">update</property>
     <property name="hibernate.show_sql">true</property>
 
