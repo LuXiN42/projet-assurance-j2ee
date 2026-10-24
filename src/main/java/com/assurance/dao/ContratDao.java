@@ -100,6 +100,32 @@ public class ContratDao extends GenericDao<Contrat, Long> {
         changerStatut(contratId, StatutContrat.RESILIE);
     }
 
+    /** Contrats ACTIFS d'un client, avec le type d'assurance déjà chargé. */
+    public List<Contrat> findActifsByClient(Long clientId) {
+        return inSession(s -> s.createQuery(
+                "select c from Contrat c join fetch c.typeAssurance " +
+                "where c.client.id = :cid and c.statut = :st order by c.dateDebut desc", Contrat.class)
+            .setParameter("cid", clientId)
+            .setParameter("st", StatutContrat.ACTIF)
+            .list());
+    }
+
+    public Contrat findByIdAvecClient(Long id) {
+        return inSession(s -> s.createQuery(
+                "select c from Contrat c join fetch c.client where c.id = :id", Contrat.class)
+                .setParameter("id", id)
+                .uniqueResult());
+    }
+
+    /** Contrat seulement s'il appartient à ce client. */
+    public Contrat findByIdEtClient(Long contratId, Long clientId) {
+        return inSession(s -> s.createQuery(
+                "from Contrat c where c.id = :id and c.client.id = :cid", Contrat.class)
+            .setParameter("id", contratId)
+            .setParameter("cid", clientId)
+            .uniqueResult());
+    }
+
     /** Prolonge le contrat de N mois à partir de sa date de fin. */
     public void renouveler(Long contratId, int dureeMois) {
         inTransaction(session -> {

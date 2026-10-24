@@ -29,7 +29,7 @@ git --version
 
 ### 1. Cloner le dépôt
 ```bash
-git clone https://github.com/<utilisateur>projet-assurance-j2ee.git
+git clone https://github.com/<utilisateur>/projet-assurance-j2ee.git
 ```
 
 ### 2. Créer la base de données

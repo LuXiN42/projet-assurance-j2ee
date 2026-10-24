@@ -16,6 +16,7 @@
     <mapping class="com.assurance.model.Garantie"/>
     <mapping class="com.assurance.model.Contrat"/>
     <mapping class="com.assurance.model.Sinistre"/>
+    <mapping class="come.assurance/.model.PieceJustificative"/>
     <mapping class="com.assurance.model.Paiement"/>
   </session-factory>
 </hibernate-configuration>

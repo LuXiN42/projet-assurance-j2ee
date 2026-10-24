@@ -3,6 +3,9 @@ package com.assurance.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity @Table(name = "sinistres", uniqueConstraints = @UniqueConstraint(name = "uk_sinistre_numero", columnNames = "numero_sinistre"))
 
@@ -31,6 +34,8 @@ public class Sinistre {
 
     @Transient public Utilisateur getClient() {return contrat != null ? contrat.getClient() : null;}
 
+    @OneToMany(mappedBy = "sinistre", cascade = CascadeType.ALL, orphanRemoval = true) private List<PieceJustificative> pieces = new ArrayList<>();
+
     public Sinistre() {}
     public Long getId(){return id;} public void setId(Long v){id=v;}
     public String getNumeroSinistre(){return numeroSinistre;} public void setNumeroSinistre(String v){numeroSinistre=v;}
@@ -43,4 +48,6 @@ public class Sinistre {
     public String getCommentaires(){return commentaires;} public void setCommentaires(String v){commentaires=v;}
     public BigDecimal getMontantIndemnisation(){return montantIndemnisation;} public void setMontantIndemnisation(BigDecimal v){montantIndemnisation=v;}
     public Contrat getContrat(){return contrat;} public void setContrat(Contrat v){contrat=v;}
+    public List<PieceJustificative> getPieces() { return pieces; }
+    public void ajouterPiece(PieceJustificative p) {pieces.add(p); p.setSinistre(this);}
 }

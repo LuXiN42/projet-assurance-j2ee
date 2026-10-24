@@ -66,6 +66,15 @@ public class SinistreDao extends GenericDao<Sinistre, Long> {
                         .setParameter("st", statut).list());
     }
 
+    public Sinistre findByIdAvecPieces(Long id) {
+        return inSession(s -> s.createQuery(
+                "select distinct si from Sinistre si " +
+                "left join fetch si.pieces join fetch si.contrat c join fetch c.typeAssurance " +
+                "where si.id = :id", Sinistre.class)
+            .setParameter("id", id)
+            .uniqueResult());
+    }
+
     // ===================== TRAITEMENT PAR L'AGENT =====================
 
     public void changerStatut(Long sinistreId, StatutSinistre statut, String commentaire) {
@@ -115,4 +124,7 @@ public class SinistreDao extends GenericDao<Sinistre, Long> {
                         .setParameter("st", StatutSinistre.INDEMNISE).uniqueResult());
         return total != null ? total : BigDecimal.ZERO;
     }
+
+
+
 }
