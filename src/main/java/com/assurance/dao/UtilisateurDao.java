@@ -34,8 +34,9 @@ public class UtilisateurDao extends GenericDao<Utilisateur, Long> {
 
     /** Liste les utilisateurs d'un rôle donné */
     public List<Utilisateur> findByRole(Role role) {
-        return inSession(session ->
-                session.createQuery("from Utilisateur u where u.role = :role order by u.nom", Utilisateur.class).setParameter("role", role).list());
+        return inSession(s -> s.createQuery(
+                "from Utilisateur u where u.role = :r order by u.nom, u.prenom", Utilisateur.class)
+            .setParameter("r", role).list());
     }
 
     /** Nombre d'utilisateurs d'un rôle */

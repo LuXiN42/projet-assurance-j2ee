@@ -1,5 +1,6 @@
 package com.assurance.dao;
 
+import com.assurance.model.Commentaire;
 import com.assurance.model.Sinistre;
 import com.assurance.model.StatutSinistre;
 
@@ -28,6 +29,20 @@ public class SinistreDao extends GenericDao<Sinistre, Long> {
                 session.createQuery(FETCH + "where s.id = :id", Sinistre.class)
                         .setParameter("id", id).uniqueResult());
     }
+
+    public Sinistre findByIdAvecCommentaires(Long id) {
+            return inSession(session ->
+                    session.createQuery(
+                            "select distinct s from Sinistre s " +
+                            "join fetch s.commentairesEntities c " +
+                            "join fetch c.auteur " +
+                            "join fetch s.contrat ct " +
+                            "join fetch ct.client " +
+                            "where s.id = :id", Sinistre.class)
+                            .setParameter("id", id)
+                            .uniqueResult());
+        }
+
 
     public Sinistre findByNumero(String numero) {
         return inSession(session ->
@@ -88,20 +103,62 @@ public class SinistreDao extends GenericDao<Sinistre, Long> {
         });
     }
 
+    public void ajouterCommentaire(Long sinistreId, Commentaire commentaire) {
+            inTransaction(session -> {
+                Sinistre s = session.get(Sinistre.class, sinistreId);
+                if (s == null) throw new IllegalArgumentException("Sinistre introuvable : " + sinistreId);
+                if (commentaire.getAuteur() == null) {
+                    throw new IllegalArgumentException("L'auteur du commentaire est obligatoire");
+                }
+                commentaire.setDateCreation(
+                        commentaire.getDateCreation() != null ? commentaire.getDateCreation()
+                                                            : java.time.LocalDateTime.now());
+                s.ajouterCommentaire(commentaire);
+                // Pas besoin d'un session.save explicite : cascade.ALL + lien
+                // bidirectionnel suffisent.
+            });
+        }
+
+    public void traiterSinistre(Long sinistreId,
+                                    StatutSinistre nouveauStatut,
+                                    BigDecimal montantIndemnisation) {
+            inTransaction(session -> {
+                Sinistre s = session.get(Sinistre.class, sinistreId);
+                if (s == null) throw new IllegalArgumentException("Sinistre introuvable : " + sinistreId);
+
+                // 1. Contrôle du montant s'il est fourni
+                if (montantIndemnisation != null && montantIndemnisation.signum() < 0) {
+                    throw new IllegalArgumentException("Le montant d'indemnisation ne peut pas être négatif");
+                }
+
+                // 2. Si un montant est fourni, le statut doit être ACCEPTE ou INDEMNISE
+                if (montantIndemnisation != null
+                        && nouveauStatut != StatutSinistre.ACCEPTE
+                        && nouveauStatut != StatutSinistre.INDEMNISE) {
+                    throw new IllegalStateException(
+                            "Le montant d'indemnisation n'est autorisé que pour les statuts ACCEPTE ou INDEMNISE");
+                }
+
+                // 3. Si on passe à INDEMNISE, le montant est obligatoire
+                if (nouveauStatut == StatutSinistre.INDEMNISE && montantIndemnisation == null) {
+                    throw new IllegalStateException(
+                            "Un montant d'indemnisation est obligatoire pour passer le sinistre à INDEMNISE");
+                }
+
+                // 4. Si on vide le montant, le statut ne doit plus être INDEMNISE
+                if (montantIndemnisation == null && nouveauStatut == StatutSinistre.INDEMNISE) {
+                    throw new IllegalStateException(
+                            "Impossible de passer à INDEMNISE sans montant");
+                }
+
+                s.setStatut(nouveauStatut);
+                s.setMontantIndemnisation(montantIndemnisation);
+            });
+        }
+
     /** Enregistre l'indemnisation : seul un sinistre ACCEPTE peut être indemnisé. */
     public void indemniser(Long sinistreId, BigDecimal montant) {
-        inTransaction(session -> {
-            Sinistre s = session.get(Sinistre.class, sinistreId);
-            if (s == null) throw new IllegalArgumentException("Sinistre introuvable : " + sinistreId);
-            if (s.getStatut() != StatutSinistre.ACCEPTE) {
-                throw new IllegalStateException("Seul un sinistre ACCEPTE peut être indemnisé");
-            }
-            if (montant == null || montant.signum() <= 0) {
-                throw new IllegalArgumentException("Montant d'indemnisation invalide");
-            }
-            s.setMontantIndemnisation(montant);
-            s.setStatut(StatutSinistre.INDEMNISE);
-        });
+        traiterSinistre(sinistreId, StatutSinistre.INDEMNISE, montant);
     }
 
     /** Génère un numéro, ex. SIN-2026-00007. */

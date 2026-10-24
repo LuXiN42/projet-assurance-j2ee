@@ -23,7 +23,7 @@ public class TypeAssuranceDao extends GenericDao<TypeAssurance, Long> {
         return findByNom(nom) != null;
     }
 
-    /** Charge le type avec ses garanties (évite LazyInitializationException dans la JSP). */
+    /** Charge le type avec ses garanties. */
     public TypeAssurance findByIdWithGaranties(Long id) {
         return inSession(session ->
                 session.createQuery("select distinct t from TypeAssurance t " +

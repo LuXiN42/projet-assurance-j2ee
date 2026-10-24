@@ -3,6 +3,8 @@ package com.assurance.controller;
 import com.assurance.dao.ContratDao;
 import com.assurance.dao.SinistreDao;
 import com.assurance.model.*;
+import com.assurance.service.BusinessException;
+import com.assurance.service.SinistreService;
 import com.assurance.util.SessionKeys;
 
 import jakarta.servlet.ServletException;
@@ -32,8 +34,7 @@ public class DeclarerSinistreServlet extends HttpServlet {
     private static final int MAX_FICHIERS = 5;
 
     private final ContratDao contratDao = new ContratDao();
-    private final SinistreDao sinistreDao = new SinistreDao();
-
+    private final SinistreService sinistreService = new SinistreService(new SinistreDao(), contratDao);
     // ===================== GET : afficher le formulaire =====================
 
     @Override
@@ -43,8 +44,8 @@ public class DeclarerSinistreServlet extends HttpServlet {
         if (u == null) return;
 
         req.setAttribute("contrats", contratDao.findActifsByClient(u.getId()));
-        req.getRequestDispatcher(VUE).forward(req, resp);
         req.setAttribute("aujourdhui", LocalDate.now());
+        req.getRequestDispatcher(VUE).forward(req, resp);
     }
 
     // ===================== POST : enregistrer la déclaration =====================
@@ -54,13 +55,13 @@ public class DeclarerSinistreServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         Utilisateur u = clientConnecte(req, resp);
-        try {
-            req.getParts();   // force la lecture du multipart
-        } catch (IllegalStateException e) {
-            erreur(req, resp, u, "Fichier trop volumineux (5 Mo maximum par fichier, 25 Mo au total).");
-            return;
-        }
-        if (u == null) return;
+            if (u == null) return;
+            try {
+                req.getParts();
+            } catch (IllegalStateException e) {
+                erreur(req, resp, u, "Fichier trop volumineux (5 Mo maximum par fichier, 25 Mo au total).");
+                return;
+            }
 
         // ---------- 1. Lecture et validation des champs ----------
         String description  = trim(req.getParameter("description"));
@@ -82,39 +83,18 @@ public class DeclarerSinistreServlet extends HttpServlet {
             return;
         }
 
-        if (description.length() < 10 || description.length() > 2000) {
-            erreur(req, resp, u, "La description doit contenir entre 10 et 2000 caractères.");
-            return;
-}
-        if (typeSinistre.isEmpty() || typeSinistre.length() > 120) {
-            erreur(req, resp, u, "Le type de sinistre est obligatoire.");
-            return;
-        }
-
         BigDecimal montantEstime = null;
         String montantTxt = trim(req.getParameter("montantEstime"));
         if (!montantTxt.isEmpty()) {
             try {
                 montantEstime = new BigDecimal(montantTxt.replace(',', '.'));
-                if (montantEstime.signum() < 0) throw new NumberFormatException();
             } catch (NumberFormatException e) {
                 erreur(req, resp, u, "Le montant estimé doit être un nombre positif.");
                 return;
             }
         }
 
-        // ---------- 2. Règles métier sur le contrat ----------
-        Contrat contrat = contratDao.findByIdEtClient(contratId, u.getId());
-        if (contrat == null || contrat.getStatut() != StatutContrat.ACTIF) {
-            erreur(req, resp, u, "Contrat invalide ou non actif.");
-            return;
-        }
-        if (date.isAfter(LocalDate.now()) || date.isBefore(contrat.getDateDebut())) {
-            erreur(req, resp, u, "La date doit être comprise entre le début du contrat et aujourd'hui.");
-            return;
-        }
-
-        // ---------- 3. Validation des fichiers (avant toute écriture) ----------
+        // ---------- 2. Validation des fichiers (avant toute écriture) ----------
         List<Part> fichiers = new ArrayList<>();
         for (Part p : req.getParts()) {
             if ("pieces".equals(p.getName()) && p.getSize() > 0) {
@@ -132,43 +112,48 @@ public class DeclarerSinistreServlet extends HttpServlet {
             }
         }
 
-        // ---------- 4. Création du sinistre ----------
-        Sinistre s = new Sinistre();
-        s.setNumeroSinistre("SIN-" + LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE)
-                + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-        s.setDate(date);
-        s.setDescription(description);
-        s.setTypeSinistre(typeSinistre);
-        s.setMontantEstime(montantEstime);
-        s.setStatut(StatutSinistre.DECLARE);
-        s.setContrat(contrat);
-
-        // ---------- 5. Écriture des fichiers sur le disque ----------
+        // ---------- 3. Écriture des fichiers sur disque (avant validation métier) ----------
         Files.createDirectories(DOSSIER_UPLOADS);
         List<Path> ecrits = new ArrayList<>();
-        try {
-            for (Part p : fichiers) {
-                String nomStocke = UUID.randomUUID() + "." + extension(p.getSubmittedFileName());
-                Path cible = DOSSIER_UPLOADS.resolve(nomStocke);
-                try (InputStream in = p.getInputStream()) {
-                    Files.copy(in, cible);
-                }
-                ecrits.add(cible);
-
-                PieceJustificative piece = new PieceJustificative();
-                piece.setNomOriginal(Paths.get(p.getSubmittedFileName()).getFileName().toString());
-                piece.setNomStocke(nomStocke);
-                piece.setTypeMime(p.getContentType());
-                piece.setTaille(p.getSize());
-                s.ajouterPiece(piece);
+        List<PieceJustificative> pieces = new ArrayList<>();
+        for (Part p : fichiers) {
+            String nomStocke = UUID.randomUUID() + "." + extension(p.getSubmittedFileName());
+            Path cible = DOSSIER_UPLOADS.resolve(nomStocke);
+            try (InputStream in = p.getInputStream()) {
+                Files.copy(in, cible);
             }
+            ecrits.add(cible);
 
-            // ---------- 6. Enregistrement en base (sinistre + pièces grâce au cascade) ----------
-            sinistreDao.save(s);
+            PieceJustificative piece = new PieceJustificative();
+            piece.setNomOriginal(Paths.get(p.getSubmittedFileName()).getFileName().toString());
+            piece.setNomStocke(nomStocke);
+            piece.setTypeMime(p.getContentType());
+            piece.setTaille(p.getSize());
+            pieces.add(piece);
+        }
 
-        } catch (Exception e) {
-            // Cohérence : si la base échoue, on supprime les fichiers déjà écrits
-            for (Path f : ecrits) Files.deleteIfExists(f);
+        // ---------- 4. Délégation au service métier ----------
+        Sinistre s;
+        try {
+            s = sinistreService.declarer(
+                    u.getId(),
+                    contratId,
+                    date,
+                    description,
+                    typeSinistre,
+                    montantEstime,
+                    pieces);
+        } catch (BusinessException e) {
+            // Si la validation métier échoue, on supprime les fichiers déjà écrits.
+            for (Path f : ecrits) {
+                try { Files.deleteIfExists(f); } catch (IOException ignored) {}
+            }
+            erreur(req, resp, u, e.getMessage());
+            return;
+        } catch (RuntimeException e) {
+            for (Path f : ecrits) {
+                try { Files.deleteIfExists(f); } catch (IOException ignored) {}
+            }
             log("Erreur lors de la déclaration du sinistre", e);
             erreur(req, resp, u, "Une erreur est survenue, la déclaration n'a pas été enregistrée.");
             return;
@@ -197,8 +182,8 @@ public class DeclarerSinistreServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setAttribute("erreur", message);
         req.setAttribute("contrats", contratDao.findActifsByClient(u.getId()));
-        req.getRequestDispatcher(VUE).forward(req, resp);
         req.setAttribute("aujourdhui", LocalDate.now());
+        req.getRequestDispatcher(VUE).forward(req, resp);
     }
 
     private static String trim(String v) {
@@ -209,5 +194,11 @@ public class DeclarerSinistreServlet extends HttpServlet {
         if (nomFichier == null) return "";
         int i = nomFichier.lastIndexOf('.');
         return i < 0 ? "" : nomFichier.substring(i + 1).toLowerCase();
+    }
+
+    private static void supprimerFichiers(List<Path> fichiers) {
+    for (Path f : fichiers) {
+        try { Files.deleteIfExists(f); } catch (IOException ignored) {}
+    }
     }
 }

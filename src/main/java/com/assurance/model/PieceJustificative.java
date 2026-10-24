@@ -7,26 +7,20 @@ import java.time.LocalDateTime;
 @Table(name = "pieces_justificatives")
 public class PieceJustificative {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
-    @Column(name = "nom_original", nullable = false, length = 255)
-    private String nomOriginal;
+    @Column(name = "nom_original", nullable = false, length = 255) private String nomOriginal;
 
-    @Column(name = "nom_stocke", nullable = false, unique = true, length = 300)
-    private String nomStocke;
+    @Column(name = "nom_stocke", nullable = false, unique = true, length = 300) private String nomStocke;
 
-    @Column(name = "type_mime", length = 100)
-    private String typeMime;
+    @Column(name = "type_mime", length = 100) private String typeMime; 
 
     private long taille;
 
-    @Column(name = "date_depot", nullable = false)
-    private LocalDateTime dateDepot = LocalDateTime.now();
+    @Column(name = "date_depot", nullable = false) private LocalDateTime dateDepot = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "sinistre_id", nullable = false)
-    private Sinistre sinistre;
+    @JoinColumn(name = "sinistre_id", nullable = false) private Sinistre sinistre;
 
     public PieceJustificative() {}
 

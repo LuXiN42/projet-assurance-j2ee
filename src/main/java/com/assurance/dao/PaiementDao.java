@@ -1,5 +1,6 @@
 package com.assurance.dao;
 
+import com.assurance.model.ModePaiement;
 import com.assurance.model.Paiement;
 import com.assurance.model.StatutPaiement;
 
@@ -74,6 +75,23 @@ public class PaiementDao extends GenericDao<Paiement, Long> {
             p.setStatut(StatutPaiement.EFFECTUE);
             p.setDate(LocalDate.now());
         });
+    }
+
+    /** Change le statut ; met la date à aujourd'hui si EFFECTUE. */
+    public void changerStatut(Long paiementId, StatutPaiement nouveau, ModePaiement mode) {
+        inTransaction(session -> {
+            Paiement p = session.get(Paiement.class, paiementId);
+            if (p == null) throw new IllegalArgumentException("Paiement introuvable : " + paiementId);
+            p.setStatut(nouveau);
+            if (mode != null) p.setModePaiement(mode);
+            if (nouveau == StatutPaiement.EFFECTUE) p.setDate(LocalDate.now());
+        });
+    }
+
+    public Paiement findByIdComplet(Long id) {
+        return inSession(session ->
+                session.createQuery(FETCH + "where p.id = :id", Paiement.class)
+                        .setParameter("id", id).uniqueResult());
     }
 
     // ===================== STATISTIQUES =====================

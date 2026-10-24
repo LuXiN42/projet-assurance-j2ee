@@ -11,10 +11,11 @@
 
     <ul>
         <li>Consulter les clients</li>
-        <li>Gérer les contrats</li>
+        <li><a href="${pageContext.request.contextPath}/agent/contrats">Gérer les contrats</a></li>
         <li>Gérer les sinistres</li>
         <li>Gérer les garanties</li>
-        <li>Enregistrer les paiements</li>
+        <li><a href="${ctx}/agent/paiements">Paiements</a></li>
+        <li><a href="${ctx}/agent/paiements/form">Enregistrer un paiement</a></li>
         <li>Statistiques</li>
     </ul>
 

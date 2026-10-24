@@ -33,7 +33,7 @@ public class ContratDao extends GenericDao<Contrat, Long> {
 
     public Contrat findByNumero(String numero) {
         return inSession(session ->
-                session.createQuery(FETCH + "where c.numero = :numero", Contrat.class)
+                session.createQuery(FETCH + "where c.numeroContrat = :numero", Contrat.class)
                         .setParameter("numero", numero).uniqueResult());
     }
 
@@ -66,7 +66,7 @@ public class ContratDao extends GenericDao<Contrat, Long> {
         boolean avecNom = nomClient != null && !nomClient.isBlank();
 
         StringBuilder hql = new StringBuilder(FETCH + "where 1=1 ");
-        if (avecNumero)     hql.append("and c.numero like :numero ");
+        if (avecNumero)     hql.append("and c.numeroContrat like :numero ");
         if (avecNom)        hql.append("and lower(c.client.nom) like :nom ");
         if (typeId != null) hql.append("and c.typeAssurance.id = :typeId ");
         if (statut != null) hql.append("and c.statut = :statut ");
@@ -103,8 +103,7 @@ public class ContratDao extends GenericDao<Contrat, Long> {
     /** Contrats ACTIFS d'un client, avec le type d'assurance déjà chargé. */
     public List<Contrat> findActifsByClient(Long clientId) {
         return inSession(s -> s.createQuery(
-                "select c from Contrat c join fetch c.typeAssurance " +
-                "where c.client.id = :cid and c.statut = :st order by c.dateDebut desc", Contrat.class)
+                FETCH + "where c.client.id = :cid and c.statut = :st order by c.dateDebut desc", Contrat.class)
             .setParameter("cid", clientId)
             .setParameter("st", StatutContrat.ACTIF)
             .list());
@@ -124,20 +123,6 @@ public class ContratDao extends GenericDao<Contrat, Long> {
             .setParameter("id", contratId)
             .setParameter("cid", clientId)
             .uniqueResult());
-    }
-
-    /** Prolonge le contrat de N mois à partir de sa date de fin. */
-    public void renouveler(Long contratId, int dureeMois) {
-        inTransaction(session -> {
-            Contrat c = session.get(Contrat.class, contratId);
-            if (c == null) throw new IllegalArgumentException("Contrat introuvable : " + contratId);
-            if (c.getStatut() == StatutContrat.RESILIE) {
-                throw new IllegalStateException("Un contrat résilié ne peut pas être renouvelé");
-            }
-            LocalDate base = c.getDateFin().isBefore(LocalDate.now()) ? LocalDate.now() : c.getDateFin();
-            c.setDateFin(base.plusMonths(dureeMois));
-            c.setStatut(StatutContrat.ACTIF);
-        });
     }
 
     /** Passe en EXPIRE les contrats actifs dont la date de fin est dépassée. */
