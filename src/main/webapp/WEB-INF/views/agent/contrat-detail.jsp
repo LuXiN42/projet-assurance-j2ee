@@ -18,9 +18,33 @@
 
 <h2>Garanties</h2>
 <ul>
-  <c:forEach var="g" items="${contrat.garanties}"><li>${g.nom}</li></c:forEach>
+  <c:forEach var="g" items="${contrat.garanties}">
+    <li>
+      <c:out value="${g.nom}"/>
+      <c:if test="${st != 'RESILIE' && st != 'EXPIRE'}">
+        <form method="post" action="${ctx}/agent/contrats/garanties" style="display:inline">
+          <input type="hidden" name="contratId" value="${contrat.id}">
+          <input type="hidden" name="garantieId" value="${g.id}">
+          <button name="action" value="dissocier" onclick="return confirm('Retirer cette garantie ?')">Retirer</button>
+        </form>
+      </c:if>
+    </li>
+  </c:forEach>
   <c:if test="${empty contrat.garanties}"><li><em>Aucune garantie associée.</em></li></c:if>
 </ul>
+
+<c:if test="${st != 'RESILIE' && st != 'EXPIRE' && not empty garantiesDispo}">
+  <form method="post" action="${ctx}/agent/contrats/garanties">
+    <input type="hidden" name="contratId" value="${contrat.id}">
+    <select name="garantieId" required>
+      <option value="">— ajouter une garantie —</option>
+      <c:forEach var="g" items="${garantiesDispo}">
+        <option value="${g.id}"><c:out value="${g.nom}"/></option>
+      </c:forEach>
+    </select>
+    <button name="action" value="associer">Associer</button>
+  </form>
+</c:if>
 
 <h2>Actions</h2>
 <c:set var="st" value="${contrat.statut}"/>

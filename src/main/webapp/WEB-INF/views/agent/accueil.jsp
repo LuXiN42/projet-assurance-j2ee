@@ -13,8 +13,7 @@
         <li><a href="${ctx}/agent/clients">Consulter les clients</a></li>
         <li><a href="${pageContext.request.contextPath}/agent/contrats">Gérer les contrats</a></li>
         <li><a href="${ctx}/agent/sinistres">Gérer les sinistres</a></li>
-        <li>Gérer les garanties</li>
-        <li><a href="${ctx}/agent/paiements">Paiements</a></li>
+        <li><a href="${ctx}/agent/garanties">Gérer les garanties</a></li>        <li><a href="${ctx}/agent/paiements">Paiements</a></li>
         <li><a href="${ctx}/agent/paiements/form">Enregistrer un paiement</a></li>
         <li>Statistiques</li>
     </ul>
