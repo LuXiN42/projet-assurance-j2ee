@@ -11,7 +11,7 @@
 
     <ul>
         <li>Gérer les utilisateurs</li>
-        <li>Gérer les types d'assurance</li>
+        <li><a href="${ctx}/admin/types">Gérer les types d'assurance</a></li>
         <li>Tous les contrats</li>
         <li>Tous les sinistres</li>
         <li>Statistiques globales</li>
