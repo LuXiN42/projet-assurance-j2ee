@@ -23,3 +23,6 @@ replay_pid*
 .settings/
 .project
 .classpath
+
+# Scripts de lancement perso (chemins propres a chaque PC)
+deploy*.bat
