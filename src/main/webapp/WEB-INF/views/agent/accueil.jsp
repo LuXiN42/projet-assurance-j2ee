@@ -12,7 +12,7 @@
     <ul>
         <li>Consulter les clients</li>
         <li><a href="${pageContext.request.contextPath}/agent/contrats">Gérer les contrats</a></li>
-        <li>Gérer les sinistres</li>
+        <li><a href="${ctx}/agent/sinistres">Gérer les sinistres</a></li>
         <li>Gérer les garanties</li>
         <li><a href="${ctx}/agent/paiements">Paiements</a></li>
         <li><a href="${ctx}/agent/paiements/form">Enregistrer un paiement</a></li>
