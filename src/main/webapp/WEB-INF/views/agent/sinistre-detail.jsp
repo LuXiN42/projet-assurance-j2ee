@@ -83,13 +83,13 @@
 </div>
 
 <div class="carte">
-    <h2>Commentaires (${fn:length(s.commentairesEntities)})</h2>
+    <h2>Commentaires (${fn:length(s.commentaires)})</h2>
     <c:choose>
-        <c:when test="${empty s.commentairesEntities}">
+        <c:when test="${empty s.commentaires}">
             <p>Aucun commentaire pour le moment.</p>
         </c:when>
         <c:otherwise>
-            <c:forEach var="c" items="${s.commentairesEntities}">
+            <c:forEach var="c" items="${s.commentaires}">
                 <div style="border-left:3px solid #1a3d6d;padding:0.4rem 0.8rem;margin:0.5rem 0;background:#f7faff;">
                     <strong><c:out value="${c.auteur.nom}"/> <c:out value="${c.auteur.prenom}"/></strong>
                     <em>(<fmt:formatDate value="${c.dateCreation}" pattern="dd/MM/yyyy HH:mm"/>)</em>

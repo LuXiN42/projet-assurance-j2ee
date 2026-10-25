@@ -74,4 +74,18 @@ public class UtilisateurDao extends GenericDao<Utilisateur, Long> {
                         "select count(u) from Utilisateur u " +
                         "where u.role = :role and u.dateInscription >= :depuis", Long.class).setParameter("role", Role.CLIENT).setParameter("depuis", depuis).uniqueResult());
         }
+
+    /** Recherche de clients uniquement (motCle vide = tous les clients). */
+    public List<Utilisateur> rechercherClients(String motCle) {
+        String pattern = "%" + (motCle == null ? "" : motCle.toLowerCase().trim()) + "%";
+        return inSession(session ->
+                session.createQuery(
+                        "from Utilisateur u where u.role = :role and (" +
+                        "lower(u.nom) like :p or lower(u.prenom) like :p or lower(u.email) like :p) " +
+                        "order by u.nom, u.prenom", Utilisateur.class)
+                    .setParameter("role", Role.CLIENT)
+                    .setParameter("p", pattern)
+                    .list());
+    }
 }
+

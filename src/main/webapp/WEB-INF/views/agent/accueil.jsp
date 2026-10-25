@@ -10,7 +10,7 @@
     <p>Bonjour ${sessionScope.utilisateur.prenom} !</p>
 
     <ul>
-        <li>Consulter les clients</li>
+        <li><a href="${ctx}/agent/clients">Consulter les clients</a></li>
         <li><a href="${pageContext.request.contextPath}/agent/contrats">Gérer les contrats</a></li>
         <li><a href="${ctx}/agent/sinistres">Gérer les sinistres</a></li>
         <li>Gérer les garanties</li>

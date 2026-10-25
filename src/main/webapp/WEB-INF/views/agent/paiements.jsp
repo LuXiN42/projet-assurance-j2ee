@@ -3,6 +3,9 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><title>Paiements</title></head>
 <body>
+
+<p><a href="${ctx}/agent/accueil">← Accueil agent</a></p>
+
 <h1>Paiements</h1>
 <c:if test="${not empty param.msg}"><p style="color:green"><c:out value="${param.msg}"/></p></c:if>
 

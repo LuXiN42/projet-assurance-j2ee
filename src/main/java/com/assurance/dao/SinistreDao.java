@@ -35,9 +35,10 @@ public class SinistreDao extends GenericDao<Sinistre, Long> {
         return inSession(session -> {
             Sinistre s = session.createQuery(
                     "select distinct s from Sinistre s " +
-                    "left join fetch s.commentairesEntities c " +
+                    "left join fetch s.commentaires c " +
                     "left join fetch c.auteur " +
                     "join fetch s.contrat ct " +
+                    "left join fetch ct.typeAssurance " +
                     "join fetch ct.client " +
                     "where s.id = :id", Sinistre.class)
                     .setParameter("id", id)

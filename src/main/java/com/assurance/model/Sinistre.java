@@ -44,7 +44,6 @@ public class Sinistre {
     public Contrat getContrat(){return contrat;} public void setContrat(Contrat v){contrat=v;}
     public List<PieceJustificative> getPieces() { return pieces; } public void setPieces(List<PieceJustificative> pieces) { this.pieces = pieces; }
     public void ajouterPiece(PieceJustificative p) {pieces.add(p); p.setSinistre(this);}
-    public List<Commentaire> getCommentairesEntities() { return commentaires; }
-    public void setCommentairesEntities(List<Commentaire> commentaires) { this.commentaires = commentaires; }
+    public List<Commentaire> getCommentaires() { return commentaires; } public void setCommentaires(List<Commentaire> commentaires) { this.commentaires = commentaires; }
     public void ajouterCommentaire(Commentaire c) {c.setSinistre(this); this.commentaires.add(c);}
 }
