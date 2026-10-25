@@ -55,7 +55,30 @@
             <td><c:out value="${s.client.nom}"/> <c:out value="${s.client.prenom}"/>
                 (<c:out value="${s.client.email}"/>)</td></tr>
         <tr><th>Pièces</th>
-            <td><c:out value="${s.piecesJustificatives}"/></td></tr>
+            <td>
+                <c:choose>
+                    <c:when test="${empty s.pieces}">
+                        <em>Aucune pièce justificative.</em>
+                    </c:when>
+                    <c:otherwise>
+                        <ul style="margin:0; padding-left:1rem;">
+                            <c:forEach var="p" items="${s.pieces}">
+                                <li>
+                                    <a href="<c:url value='/agent/piece'>
+                                              <c:param name='id' value='${p.id}'/>
+                                              </c:url>">
+                                        <c:out value="${p.nomOriginal}"/>
+                                    </a>
+                                    <span style="color:#666;">
+                                        (<fmt:formatNumber value="${p.taille}" pattern="#,##0"/> octets
+                                        — <fmt:formatDate value="${p.dateDepot}" pattern="dd/MM/yyyy HH:mm"/>)
+                                    </span>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </c:otherwise>
+                </c:choose>
+            </td></tr>
     </table>
 </div>
 

@@ -31,7 +31,7 @@ public class GarantieDao extends GenericDao<Garantie, Long> {
     /** Garanties proposées par un type d'assurance. */
     public List<Garantie> findByTypeAssurance(Long typeId) {
         return inSession(session ->
-                session.createQuery("select g from TypeAssurance t join t.garanties g " +
+                session.createQuery("select g from TypeAssurance t join t.garantiesDisponibles g " +
                                 "where t.id = :id order by g.nom", Garantie.class)
                         .setParameter("id", typeId).list());
     }

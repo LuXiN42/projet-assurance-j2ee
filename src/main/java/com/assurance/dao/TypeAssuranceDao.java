@@ -27,7 +27,7 @@ public class TypeAssuranceDao extends GenericDao<TypeAssurance, Long> {
     public TypeAssurance findByIdWithGaranties(Long id) {
         return inSession(session ->
                 session.createQuery("select distinct t from TypeAssurance t " +
-                                "left join fetch t.garanties where t.id = :id", TypeAssurance.class)
+                                "left join fetch t.garantiesDisponibles where t.id = :id", TypeAssurance.class)
                         .setParameter("id", id).uniqueResult());
     }
 

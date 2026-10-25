@@ -75,22 +75,22 @@ public class TraiterSinistreServlet extends HttpServlet {
             return;
         }
 
-        try {
-            if ("ajouterCommentaire".equals(action)) {
-                ajouterCommentaire(req, agent, sinistreId);
-            } else if ("changerStatut".equals(action)) {
-                changerStatut(req, sinistreId);
-            } else if ("indemniser".equals(action)) {
-                indemniser(req, sinistreId);
-            } else {
-                req.getSession().setAttribute("erreur", "Action inconnue : " + action);
+            try {
+                if ("ajouterCommentaire".equals(action)) {
+                    ajouterCommentaire(req, agent, sinistreId);
+                } else if ("changerStatut".equals(action)) {
+                    changerStatut(req, sinistreId);
+                } else if ("indemniser".equals(action)) {
+                    indemniser(req, sinistreId);
+                } else {
+                    req.getSession().setAttribute("erreur", "Action inconnue : " + action);
+                }
+            } catch (BusinessException | IllegalArgumentException | IllegalStateException e) {
+                req.getSession().setAttribute("erreur", e.getMessage());
+            } catch (Exception e) {
+                log("Erreur lors du traitement du sinistre " + sinistreId, e);
+                req.getSession().setAttribute("erreur", "Erreur technique, merci de réessayer.");
             }
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            req.getSession().setAttribute("erreur", e.getMessage());
-        } catch (Exception e) {
-            log("Erreur lors du traitement du sinistre " + sinistreId, e);
-            req.getSession().setAttribute("erreur", "Erreur technique, merci de réessayer.");
-        }
 
         // PRG
         resp.sendRedirect(req.getContextPath() + "/agent/sinistre?id=" + sinistreId);
@@ -132,7 +132,7 @@ public class TraiterSinistreServlet extends HttpServlet {
 
     private void indemniser(HttpServletRequest req, Long sinistreId) {
         BigDecimal montant = parseMontant(req.getParameter("montantIndemnisation"), true);
-        sinistreDao.indemniser(sinistreId, montant);
+        sinistreService.indemniser(sinistreId, montant);
         req.getSession().setAttribute("message", "Sinistre indemnisé (" + montant + " €).");
     }
 
@@ -148,12 +148,7 @@ public class TraiterSinistreServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/login");
             return null;
         }
-        // NOTE : Role.java déclare AGENT_ASSURANCE ; les autres servlets
-        // utilisent Role.AGENT. On accepte les deux pour ne pas casser
-        // l'authentification si le code est harmonisé ultérieurement.
-        if (u.getRole() != Role.AGENT && u.getRole() != Role.ADMIN
-                && !"AGENT_ASSURANCE".equals(u.getRole().name())
-                && !"ADMINISTRATEUR".equals(u.getRole().name())) {
+        if (u.getRole() != Role.AGENT && u.getRole() != Role.ADMIN) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès réservé aux agents");
             return null;
         }
