@@ -2,7 +2,6 @@ package com.assurance.controller.admin;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -78,26 +77,6 @@ public class TypeAssuranceFormServlet extends HttpServlet {
                 if (g == null) v.ajouter("Une des garanties choisies n'existe pas.");
                 else { garanties.add(g); idsCoches.add(garantieId); }
             }
-        }
-
-        if (!v.estValide()) {
-            TypeAssurance saisie = new TypeAssurance();
-            saisie.setId(id);
-            saisie.setNom(nom);
-            saisie.setDescription(description);
-            saisie.setPrixBase(prixBase);
-            afficherFormulaire(request, response, saisie, idsCoches, v.getErreurs());
-            return;
-        }
-
-        if (!v.estValide()) {
-            TypeAssurance saisie = new TypeAssurance();
-            saisie.setId(id);
-            saisie.setNom(nom);
-            saisie.setDescription(description);
-            saisie.setPrixBase(prixBase);
-            afficherFormulaire(request, response, saisie, idsCoches, v.getErreurs());
-            return;
         }
 
         // S'il y a des erreurs, on réaffiche le formulaire avec ce que l'admin avait tapé

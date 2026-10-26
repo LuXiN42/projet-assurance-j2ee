@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.assurance.dao.ContratDao;
 import com.assurance.dao.UtilisateurDao;
 import com.assurance.model.Role;
 import com.assurance.model.Utilisateur;
@@ -24,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class UtilisateurFormServlet extends HttpServlet {
 
     private UtilisateurDao utilisateurDao = new UtilisateurDao();
+    private ContratDao contratDao = new ContratDao();   
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -74,6 +76,13 @@ public class UtilisateurFormServlet extends HttpServlet {
         if (id != null && admin != null && id.equals(admin.getId()) && role != null && role != Role.ADMIN)
             v.ajouter("Vous ne pouvez pas retirer votre propre rôle d'administrateur.");
 
+        //un client qui a des contrats doit rester client
+        if (id != null && role != null && role != Role.CLIENT) {
+            Utilisateur avant = utilisateurDao.findById(id);
+            if (avant != null && avant.getRole() == Role.CLIENT && !contratDao.findByClient(id).isEmpty())
+                v.ajouter("Ce client a des contrats : son rôle ne peut pas être changé.");
+        }
+
         if (!v.estValide()) {
             Utilisateur saisie = new Utilisateur();
             saisie.setId(id);
@@ -106,10 +115,15 @@ public class UtilisateurFormServlet extends HttpServlet {
             existant.setPrenom(prenom);
             existant.setEmail(email);
             existant.setRole(role);
-            if (motDePasse != null) {          // remplace l'ancien "motDePasseRempli"
+            if (motDePasse != null) {
                 existant.setPasswordHash(PasswordUtil.hacher(motDePasse));
             }
             utilisateurDao.update(existant);
+
+            //si l'admin a modifié son propre compte, on met la session à jour
+            if (admin != null && id.equals(admin.getId())) {
+                request.getSession().setAttribute(SessionKeys.UTILISATEUR, existant);
+            }
             message = "Utilisateur modifié.";
         }
 
