@@ -56,6 +56,7 @@ public class GarantieService {
             throw new BusinessException("Impossible de supprimer « " + g.getNom()
                     + " » : elle est associée à au moins un contrat.");
         }
+        garantieDao.detacherDesTypes(id);
         garantieDao.delete(g);
     }
 

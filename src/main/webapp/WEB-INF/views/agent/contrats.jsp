@@ -9,7 +9,14 @@
 
 <c:if test="${not empty message}"><p style="color:green">${message}</p></c:if>
 
-<form method="get">
+<c:if test="${not empty clientFiltre}">
+  <p style="background:#eef;padding:6px">
+    Contrats de <strong><c:out value="${clientFiltre.prenom} ${clientFiltre.nom}"/></strong>
+    — <a href="${pageContext.request.contextPath}/agent/contrats">Voir tous les contrats</a>
+  </p>
+</c:if>
+
+<form method="get" action="${pageContext.request.contextPath}/agent/contrats">
   <input name="numero" placeholder="N° contrat" value="${param.numero}">
   <input name="nomClient" placeholder="Nom client" value="${param.nomClient}">
   <select name="typeId">
