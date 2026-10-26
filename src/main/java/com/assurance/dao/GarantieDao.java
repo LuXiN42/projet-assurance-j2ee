@@ -2,6 +2,7 @@ package com.assurance.dao;
 
 import com.assurance.model.Contrat;
 import com.assurance.model.Garantie;
+import com.assurance.model.TypeAssurance;
 
 import java.util.List;
 
@@ -67,5 +68,29 @@ public class GarantieDao extends GenericDao<Garantie, Long> {
                                 "where g.id = :id", Long.class)
                         .setParameter("id", garantieId).uniqueResult());
         return nb != null && nb > 0;
+    }
+
+    /** Nombre de types d'assurance qui proposent cette garantie. */
+    public long compterTypesAssurance(Long garantieId) {
+        Long nb = inSession(session ->
+                session.createQuery("select count(t) from TypeAssurance t " +
+                                "join t.garantiesDisponibles g where g.id = :id", Long.class)
+                        .setParameter("id", garantieId).uniqueResult());
+        return nb == null ? 0 : nb;
+    }
+
+    /** Retire la garantie de tous les types d'assurance qui la proposent. */
+    public void detacherDesTypes(Long garantieId) {
+        inTransaction(session -> {
+            Garantie g = session.get(Garantie.class, garantieId);
+            if (g == null) return;
+            List<TypeAssurance> types = session.createQuery(
+                    "select t from TypeAssurance t join t.garantiesDisponibles x where x.id = :id",
+                    TypeAssurance.class)
+                    .setParameter("id", garantieId).list();
+            for (TypeAssurance t : types) {
+                t.getGarantiesDisponibles().removeIf(x -> x.getId().equals(garantieId));
+            }
+        });
     }
 }
