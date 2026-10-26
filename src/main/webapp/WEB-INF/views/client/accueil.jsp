@@ -21,6 +21,7 @@
         <li><a href="${ctx}/client/paiements">Mes paiements</a></li>
         <li><a href="${ctx}/client/sinistres">Mes sinistres</a></li>
         <li><a href="${ctx}/client/sinistres/declarer">Déclarer un sinistre</a></li>
+        <li><a href="${ctx}/client/assistant">Assistant IA</a></li>
     </ul>
 
     <p><a href="${ctx}/logout">Se déconnecter</a></p>

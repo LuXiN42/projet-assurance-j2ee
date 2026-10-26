@@ -26,3 +26,5 @@ replay_pid*
 
 # Scripts de lancement perso (chemins propres a chaque PC)
 deploy*.bat
+
+src/main/resources/ia.properties
