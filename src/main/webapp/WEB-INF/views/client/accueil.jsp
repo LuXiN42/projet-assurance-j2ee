@@ -16,6 +16,7 @@
     </c:if>
 
     <ul>
+        <li><a href="${ctx}/client/profil">Mon profil</a></li>
         <li><a href="${ctx}/client/contrats">Mes contrats</a></li>
         <li><a href="${ctx}/client/paiements">Mes paiements</a></li>
         <li><a href="${ctx}/client/sinistres">Mes sinistres</a></li>
