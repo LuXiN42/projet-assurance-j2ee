@@ -64,14 +64,14 @@
                         <ul style="margin:0; padding-left:1rem;">
                             <c:forEach var="p" items="${s.pieces}">
                                 <li>
-                                    <a href="<c:url value='/agent/piece'>
+                                    <a href="<c:url value='/piece'>
                                               <c:param name='id' value='${p.id}'/>
                                               </c:url>">
                                         <c:out value="${p.nomOriginal}"/>
                                     </a>
                                     <span style="color:#666;">
                                         (<fmt:formatNumber value="${p.taille}" pattern="#,##0"/> octets
-                                        — <fmt:formatDate value="${p.dateDepot}" pattern="dd/MM/yyyy HH:mm"/>)
+                                        — <c:out value="${p.dateDepot}"/>)
                                     </span>
                                 </li>
                             </c:forEach>
@@ -92,7 +92,7 @@
             <c:forEach var="c" items="${s.commentaires}">
                 <div style="border-left:3px solid #1a3d6d;padding:0.4rem 0.8rem;margin:0.5rem 0;background:#f7faff;">
                     <strong><c:out value="${c.auteur.nom}"/> <c:out value="${c.auteur.prenom}"/></strong>
-                    <em>(<fmt:formatDate value="${c.dateCreation}" pattern="dd/MM/yyyy HH:mm"/>)</em>
+                    <em>(<c:out value="${c.dateCreation}"/>)</em>
                     <p><c:out value="${c.texte}"/></p>
                 </div>
             </c:forEach>
