@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.assurance.dao.UtilisateurDao;
@@ -13,6 +12,7 @@ import com.assurance.model.Utilisateur;
 import com.assurance.util.FormUtil;
 import com.assurance.util.PasswordUtil;
 import com.assurance.util.SessionKeys;
+import com.assurance.util.Validateur;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -48,63 +48,40 @@ public class UtilisateurFormServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-
-        Long id = FormUtil.parseLong(request.getParameter("id"));
-        String nom = request.getParameter("nom");
-        String prenom = request.getParameter("prenom");
-        String email = request.getParameter("email");
-        String motDePasse = request.getParameter("motDePasse");
-        Role role = FormUtil.parseEnum(Role.class, request.getParameter("role"));
-
-        if (nom != null) nom = nom.trim();
-        if (prenom != null) prenom = prenom.trim();
-        if (email != null) email = email.trim().toLowerCase();
-
         Utilisateur admin = (Utilisateur) request.getSession().getAttribute(SessionKeys.UTILISATEUR);
 
-        // Vérification des champs
-        List<String> erreurs = new ArrayList<>();
+        // ---- Validation commune ----
+        Validateur v = new Validateur();
+        Long id       = FormUtil.parseLong(request.getParameter("id"));
+        String nom    = v.texte(request.getParameter("nom"),    "Le nom",    2, 100, true);
+        String prenom = v.texte(request.getParameter("prenom"), "Le prénom", 2, 100, true);
+        String email  = v.email(request.getParameter("email"),  "L'email");
+        Role role     = v.choix(Role.class, request.getParameter("role"), "Le rôle");
 
-        if (nom == null || nom.isEmpty() || nom.length() > 100) {
-            erreurs.add("Le nom est obligatoire (100 caractères max).");
-        }
-        if (prenom == null || prenom.isEmpty() || prenom.length() > 100) {
-            erreurs.add("Le prénom est obligatoire (100 caractères max).");
-        }
-        if (email == null || !email.matches("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)+$")) {
-            erreurs.add("L'email n'est pas valide.");
-        } else {
+        // Mot de passe : obligatoire à la création, facultatif en modification (null = inchangé)
+        String motDePasse = (id == null)
+                ? v.motDePasse(request.getParameter("motDePasse"), request.getParameter("confirmation"))
+                : v.motDePasseOptionnel(request.getParameter("motDePasse"), request.getParameter("confirmation"));
+
+        // Email unique (hors utilisateur modifié)
+        if (email != null) {
             Utilisateur memeEmail = utilisateurDao.findByEmail(email);
-            if (memeEmail != null && !memeEmail.getId().equals(id)) {
-                erreurs.add("Cet email est déjà utilisé.");
-            }
-        }
-        if (role == null) {
-            erreurs.add("Le rôle est obligatoire.");
+            if (memeEmail != null && !memeEmail.getId().equals(id))
+                v.ajouter("Cet email est déjà utilisé.");
         }
 
-        // Le mot de passe est obligatoire à la création, facultatif en modification
-        boolean motDePasseRempli = motDePasse != null && !motDePasse.isEmpty();
-        if (id == null && !motDePasseRempli) {
-            erreurs.add("Le mot de passe est obligatoire pour un nouveau compte.");
-        }
-        if (motDePasseRempli && motDePasse.length() < 8) {
-            erreurs.add("Le mot de passe doit faire au moins 8 caractères.");
-        }
+        // L'admin ne peut pas retirer son propre rôle
+        if (id != null && admin != null && id.equals(admin.getId()) && role != null && role != Role.ADMIN)
+            v.ajouter("Vous ne pouvez pas retirer votre propre rôle d'administrateur.");
 
-        // L'admin ne peut pas s'enlever lui-même le rôle admin
-        if (id != null && id.equals(admin.getId()) && role != Role.ADMIN) {
-            erreurs.add("Vous ne pouvez pas retirer votre propre rôle d'administrateur.");
-        }
-
-        if (!erreurs.isEmpty()) {
+        if (!v.estValide()) {
             Utilisateur saisie = new Utilisateur();
             saisie.setId(id);
             saisie.setNom(nom);
             saisie.setPrenom(prenom);
             saisie.setEmail(email);
             saisie.setRole(role);
-            afficherFormulaire(request, response, saisie, erreurs);
+            afficherFormulaire(request, response, saisie, v.getErreurs());
             return;
         }
 
@@ -129,7 +106,7 @@ public class UtilisateurFormServlet extends HttpServlet {
             existant.setPrenom(prenom);
             existant.setEmail(email);
             existant.setRole(role);
-            if (motDePasseRempli) {
+            if (motDePasse != null) {          // remplace l'ancien "motDePasseRempli"
                 existant.setPasswordHash(PasswordUtil.hacher(motDePasse));
             }
             utilisateurDao.update(existant);

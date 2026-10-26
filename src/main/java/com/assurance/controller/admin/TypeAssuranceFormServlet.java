@@ -2,9 +2,7 @@ package com.assurance.controller.admin;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +12,7 @@ import com.assurance.dao.TypeAssuranceDao;
 import com.assurance.model.Garantie;
 import com.assurance.model.TypeAssurance;
 import com.assurance.util.FormUtil;
+import com.assurance.util.Validateur;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -57,37 +56,17 @@ public class TypeAssuranceFormServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        Long id = FormUtil.parseLong(request.getParameter("id"));
-        String nom = request.getParameter("nom");
-        String description = request.getParameter("description");
-        BigDecimal prixBase = FormUtil.parseBigDecimal(request.getParameter("prixBase"));
+        Validateur v = new Validateur();
+        Long id             = FormUtil.parseLong(request.getParameter("id"));
+        String nom          = v.texte(request.getParameter("nom"), "Le nom", 2, 150, true);
+        String description  = v.texte(request.getParameter("description"), "La description", 0, 2000, false);
+        BigDecimal prixBase = v.montant(request.getParameter("prixBase"), "Le prix de base", true, false);
         String[] garantiesCochees = request.getParameterValues("garanties");
 
-        if (nom != null) nom = nom.trim();
-        if (description != null) description = description.trim();
-
-        // Vérification des champs
-        List<String> erreurs = new ArrayList<>();
-
-        if (nom == null || nom.isEmpty()) {
-            erreurs.add("Le nom est obligatoire.");
-        } else if (nom.length() > 150) {
-            erreurs.add("Le nom ne doit pas dépasser 150 caractères.");
-        } else {
+        if (nom != null) {
             TypeAssurance memeNom = typeDao.findByNom(nom);
-            if (memeNom != null && !memeNom.getId().equals(id)) {
-                erreurs.add("Un type d'assurance avec ce nom existe déjà.");
-            }
-        }
-
-        if (description != null && description.length() > 2000) {
-            erreurs.add("La description ne doit pas dépasser 2000 caractères.");
-        }
-
-        if (prixBase == null) {
-            erreurs.add("Le prix de base est obligatoire et doit être un nombre.");
-        } else if (prixBase.signum() < 0) {
-            erreurs.add("Le prix de base ne peut pas être négatif.");
+            if (memeNom != null && !memeNom.getId().equals(id))
+                v.ajouter("Un type d'assurance avec ce nom existe déjà.");
         }
 
         Set<Garantie> garanties = new HashSet<>();
@@ -96,23 +75,39 @@ public class TypeAssuranceFormServlet extends HttpServlet {
             for (String s : garantiesCochees) {
                 Long garantieId = FormUtil.parseLong(s);
                 Garantie g = (garantieId == null) ? null : garantieDao.findById(garantieId);
-                if (g == null) {
-                    erreurs.add("Une des garanties choisies n'existe pas.");
-                } else {
-                    garanties.add(g);
-                    idsCoches.add(garantieId);
-                }
+                if (g == null) v.ajouter("Une des garanties choisies n'existe pas.");
+                else { garanties.add(g); idsCoches.add(garantieId); }
             }
         }
 
-        // S'il y a des erreurs, on réaffiche le formulaire avec ce que l'admin avait tapé
-        if (!erreurs.isEmpty()) {
+        if (!v.estValide()) {
             TypeAssurance saisie = new TypeAssurance();
             saisie.setId(id);
             saisie.setNom(nom);
             saisie.setDescription(description);
             saisie.setPrixBase(prixBase);
-            afficherFormulaire(request, response, saisie, idsCoches, erreurs);
+            afficherFormulaire(request, response, saisie, idsCoches, v.getErreurs());
+            return;
+        }
+
+        if (!v.estValide()) {
+            TypeAssurance saisie = new TypeAssurance();
+            saisie.setId(id);
+            saisie.setNom(nom);
+            saisie.setDescription(description);
+            saisie.setPrixBase(prixBase);
+            afficherFormulaire(request, response, saisie, idsCoches, v.getErreurs());
+            return;
+        }
+
+        // S'il y a des erreurs, on réaffiche le formulaire avec ce que l'admin avait tapé
+        if (!v.estValide()) {
+            TypeAssurance saisie = new TypeAssurance();
+            saisie.setId(id);
+            saisie.setNom(nom);
+            saisie.setDescription(description);
+            saisie.setPrixBase(prixBase);
+            afficherFormulaire(request, response, saisie, idsCoches, v.getErreurs());
             return;
         }
 
@@ -141,7 +136,7 @@ public class TypeAssuranceFormServlet extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + "/admin/types?message="
-                + URLEncoder.encode(message, StandardCharsets.UTF_8));
+                + FormUtil.enc(message));
     }
 
     private void afficherFormulaire(HttpServletRequest request, HttpServletResponse response,

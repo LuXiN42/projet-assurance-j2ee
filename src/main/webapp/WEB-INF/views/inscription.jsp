@@ -6,21 +6,25 @@
 <body>
 <h1>Créer un compte</h1>
 
+<c:if test="${not empty erreurs}">
+    <ul style="color:red">
+        <c:forEach var="e" items="${erreurs}">
+            <li><c:out value="${e}"/></li>
+        </c:forEach>
+    </ul>
+</c:if>
+
 <form method="post" action="${pageContext.request.contextPath}/inscription">
-    <label>Nom <input name="nom" value="<c:out value='${param.nom}'/>" required></label>
-    <span style="color:red">${erreurs.nom}</span><br>
+    <label>Nom <input name="nom" value="<c:out value='${param.nom}'/>" maxlength="100" required></label><br>
 
-    <label>Prénom <input name="prenom" value="<c:out value='${param.prenom}'/>" required></label>
-    <span style="color:red">${erreurs.prenom}</span><br>
+    <label>Prénom <input name="prenom" value="<c:out value='${param.prenom}'/>" maxlength="100" required></label><br>
 
-    <label>Email <input type="email" name="email" value="<c:out value='${param.email}'/>" required></label>
-    <span style="color:red">${erreurs.email}</span><br>
+    <label>Email <input type="email" name="email" value="<c:out value='${param.email}'/>" maxlength="150" required></label><br>
 
     <label>Mot de passe <input type="password" name="motDePasse" minlength="8" required></label>
-    <span style="color:red">${erreurs.motDePasse}</span><br>
+    <small>(8 caractères minimum, avec lettres et chiffres)</small><br>
 
-    <label>Confirmation <input type="password" name="confirmation" required></label>
-    <span style="color:red">${erreurs.confirmation}</span><br>
+    <label>Confirmation <input type="password" name="confirmation" minlength="8" required></label><br>
 
     <button type="submit">S'inscrire</button>
 </form>

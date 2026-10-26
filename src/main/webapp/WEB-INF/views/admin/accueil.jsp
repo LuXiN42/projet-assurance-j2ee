@@ -14,7 +14,7 @@
         <li><a href="${ctx}/admin/types">Gérer les types d'assurance</a></li>
         <li><a href="${ctx}/agent/contrats">Tous les contrats</a></li>
         <li><a href="${ctx}/agent/sinistres">Tous les sinistres</a></li>
-        <li>Statistiques globales</li>
+        <li><a href="${pageContext.request.contextPath}/admin/statistiques">Statistiques globales</a></li>
     </ul>
 
     <a href="${pageContext.request.contextPath}/logout">Se déconnecter</a>

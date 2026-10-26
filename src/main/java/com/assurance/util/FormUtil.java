@@ -1,6 +1,8 @@
 package com.assurance.util;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -35,4 +37,6 @@ public final class FormUtil {
         if (isBlank(s)) return null;
         try { return Enum.valueOf(type, s.trim()); } catch (IllegalArgumentException e) { return null; }
     }
+
+    public static String enc(String s) { return URLEncoder.encode(s, StandardCharsets.UTF_8); }
 }

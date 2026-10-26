@@ -15,7 +15,7 @@
         <li><a href="${ctx}/agent/sinistres">Gérer les sinistres</a></li>
         <li><a href="${ctx}/agent/garanties">Gérer les garanties</a></li>        <li><a href="${ctx}/agent/paiements">Paiements</a></li>
         <li><a href="${ctx}/agent/paiements/form">Enregistrer un paiement</a></li>
-        <li>Statistiques</li>
+        <li><a href="${pageContext.request.contextPath}/agent/statistiques">Statistiques</a></li>
     </ul>
 
     <a href="${pageContext.request.contextPath}/logout">Se déconnecter</a>

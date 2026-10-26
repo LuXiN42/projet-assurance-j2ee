@@ -5,6 +5,7 @@ import com.assurance.model.*;
 import com.assurance.service.BusinessException;
 import com.assurance.service.PaiementService;
 import com.assurance.util.FormUtil;
+import com.assurance.util.Validateur;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,8 +13,6 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @WebServlet("/agent/paiements/form")
 public class PaiementFormServlet extends HttpServlet {
@@ -29,37 +28,30 @@ public class PaiementFormServlet extends HttpServlet {
         afficher(req, resp);
     }
 
-    @Override
+        @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
-        Long contratId       = FormUtil.parseLong(req.getParameter("contratId"));
-        BigDecimal montant   = FormUtil.parseBigDecimal(req.getParameter("montant"));
-        LocalDate date       = FormUtil.parseDate(req.getParameter("date"));
-        ModePaiement mode    = FormUtil.parseEnum(ModePaiement.class, req.getParameter("mode"));
-        StatutPaiement stat  = FormUtil.parseEnum(StatutPaiement.class, req.getParameter("statut"));
+        // ---- Validation côté servlet (exigence section 4 du sujet) ----
+        Validateur v = new Validateur();
+        Long contratId      = v.id(req.getParameter("contratId"), "Le contrat");
+        BigDecimal montant  = v.montant(req.getParameter("montant"), "Le montant", true, true);
+        LocalDate date      = v.date(req.getParameter("date"), "La date", false);
+        ModePaiement mode   = v.choix(ModePaiement.class, req.getParameter("mode"), "Le mode de paiement", false);
+        StatutPaiement stat = v.choix(StatutPaiement.class, req.getParameter("statut"), "Le statut", true);
 
-        List<String> erreurs = new ArrayList<>();
-        if (contratId == null) erreurs.add("Contrat manquant.");
-        if (montant == null) erreurs.add("Montant manquant ou invalide.");
-        else if (montant.signum() <= 0) erreurs.add("Le montant doit être positif.");
-        if (!FormUtil.isBlank(req.getParameter("date")) && date == null)
-            erreurs.add("Date invalide (format AAAA-MM-JJ).");
-        if (!FormUtil.isBlank(req.getParameter("mode")) && mode == null)
-            erreurs.add("Mode de paiement invalide.");
-        if (stat == null) erreurs.add("Statut manquant ou invalide.");
-
-        if (erreurs.isEmpty()) {
+        if (v.estValide()) {
             try {
                 service.enregistrer(contratId, montant, date, mode, stat);
-                resp.sendRedirect(req.getContextPath() + "/agent/paiements?msg=Paiement+enregistr%C3%A9");
+                resp.sendRedirect(req.getContextPath() + "/agent/paiements?msg="
+                        + FormUtil.enc("Paiement enregistré"));
                 return;
             } catch (BusinessException e) {
-                erreurs.add(e.getMessage());
+                v.ajouter(e.getMessage());
             }
         }
-        req.setAttribute("erreurs", erreurs);
+        req.setAttribute("erreurs", v.getErreurs());
         afficher(req, resp);
     }
 
@@ -67,7 +59,6 @@ public class PaiementFormServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setAttribute("contrats", contratDao.findAllComplet());
         req.setAttribute("modes", ModePaiement.values());
-        // préremplissage depuis ?contratId=... (lien depuis la fiche contrat)
         req.setAttribute("aujourdhui", LocalDate.now());
         req.getRequestDispatcher(VUE).forward(req, resp);
     }

@@ -6,6 +6,7 @@ import com.assurance.model.*;
 import com.assurance.service.BusinessException;
 import com.assurance.service.SinistreService;
 import com.assurance.util.SessionKeys;
+import com.assurance.util.Validateur;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -17,8 +18,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @WebServlet("/client/sinistres/declarer")
@@ -63,35 +62,18 @@ public class DeclarerSinistreServlet extends HttpServlet {
                 return;
             }
 
-        // ---------- 1. Lecture et validation des champs ----------
-        String description  = trim(req.getParameter("description"));
-        String typeSinistre = trim(req.getParameter("typeSinistre"));
+        // ---------- 1 + 2. Lecture et validation commune ----------
+        Validateur v = new Validateur();
+        Long contratId           = v.id(req.getParameter("contratId"), "Le contrat");
+        LocalDate date           = v.date(req.getParameter("date"), "La date du sinistre", true);
+        v.pasDansLeFutur(date, "La date du sinistre");
+        String description       = v.texte(req.getParameter("description"), "La description", 10, 2000, true);
+        String typeSinistre      = v.texte(req.getParameter("typeSinistre"), "Le type de sinistre", 0, 120, false);
+        BigDecimal montantEstime = v.montant(req.getParameter("montantEstime"), "Le montant estimé", false, true);
 
-        Long contratId;
-        try {
-            contratId = Long.parseLong(req.getParameter("contratId"));
-        } catch (NumberFormatException e) {
-            erreur(req, resp, u, "Veuillez choisir un contrat.");
+        if (!v.estValide()) {
+            erreur(req, resp, u, v.messages());
             return;
-        }
-
-        LocalDate date;
-        try {
-            date = LocalDate.parse(req.getParameter("date"));
-        } catch (DateTimeParseException | NullPointerException e) {
-            erreur(req, resp, u, "Date invalide.");
-            return;
-        }
-
-        BigDecimal montantEstime = null;
-        String montantTxt = trim(req.getParameter("montantEstime"));
-        if (!montantTxt.isEmpty()) {
-            try {
-                montantEstime = new BigDecimal(montantTxt.replace(',', '.'));
-            } catch (NumberFormatException e) {
-                erreur(req, resp, u, "Le montant estimé doit être un nombre positif.");
-                return;
-            }
         }
 
         // ---------- 2. Validation des fichiers (avant toute écriture) ----------

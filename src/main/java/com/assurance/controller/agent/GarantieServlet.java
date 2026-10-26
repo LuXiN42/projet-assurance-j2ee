@@ -4,6 +4,7 @@ import com.assurance.model.Garantie;
 import com.assurance.service.BusinessException;
 import com.assurance.service.GarantieService;
 import com.assurance.util.FormUtil;
+import com.assurance.util.Validateur;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -37,41 +38,59 @@ public class GarantieServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/views/agent/garanties.jsp").forward(req, resp);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
-        String path = req.getPathInfo() == null ? "" : req.getPathInfo();
-        String base = req.getContextPath() + "/agent/garanties";
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            req.setCharacterEncoding("UTF-8");
+            String path = req.getPathInfo() == null ? "" : req.getPathInfo();
+            String base = req.getContextPath() + "/agent/garanties";
 
-        if (path.equals("/supprimer")) {
-            Long id = FormUtil.parseLong(req.getParameter("id"));
-            try {
-                service.supprimer(id);
-                resp.sendRedirect(base + "?msg=" + enc("Garantie supprimée."));
-            } catch (BusinessException e) {
-                resp.sendRedirect(base + "?err=" + enc(e.getMessage()));
+            if (path.equals("/supprimer")) {
+                Validateur v = new Validateur();
+                Long id = v.id(req.getParameter("id"), "La garantie");
+                if (!v.estValide()) {
+                    resp.sendRedirect(base + "?err=" + FormUtil.enc(v.messages()));
+                    return;
+                }
+                try {
+                    service.supprimer(id);
+                    resp.sendRedirect(base + "?msg=" + FormUtil.enc("Garantie supprimée."));
+                } catch (BusinessException e) {
+                    resp.sendRedirect(base + "?err=" + FormUtil.enc(e.getMessage()));
+                }
+                return;
             }
-            return;
+
+            // enregistrement (création ou modification) ; id caché : null = création
+            Long id = FormUtil.parseLong(req.getParameter("id"));
+            Validateur v = new Validateur();
+            String nom         = v.texte(req.getParameter("nom"), "Le nom", 2, 100, true);
+            String description = v.texte(req.getParameter("description"), "La description", 0, 500, false);
+
+            if (!v.estValide()) {
+                reafficher(req, resp, id, req.getParameter("nom"), req.getParameter("description"), v.messages());
+                return;
+            }
+            try {
+                if (id == null) service.creer(nom, description);
+                else service.modifier(id, nom, description);
+                resp.sendRedirect(base + "?msg=" + FormUtil.enc(id == null ? "Garantie créée." : "Garantie modifiée."));
+            } catch (BusinessException e) {
+                reafficher(req, resp, id, nom, description, e.getMessage());
+            }
         }
 
-        // enregistrement (création ou modification)
-        Long id = FormUtil.parseLong(req.getParameter("id"));
-        String nom = req.getParameter("nom");
-        String description = req.getParameter("description");
-        try {
-            if (id == null) service.creer(nom, description);
-            else service.modifier(id, nom, description);
-            resp.sendRedirect(base + "?msg=" + enc(id == null ? "Garantie créée." : "Garantie modifiée."));
-        } catch (BusinessException e) {
+        /** Réaffiche le formulaire avec la saisie de l'utilisateur et le message d'erreur. */
+        private void reafficher(HttpServletRequest req, HttpServletResponse resp, Long id,
+                                String nom, String description, String erreur)
+                throws ServletException, IOException {
             Garantie saisie = new Garantie();
             saisie.setId(id);
             saisie.setNom(nom);
             saisie.setDescription(description);
             req.setAttribute("garantie", saisie);
-            req.setAttribute("erreur", e.getMessage());
+            req.setAttribute("erreur", erreur);
             req.getRequestDispatcher("/WEB-INF/views/agent/garantie-form.jsp").forward(req, resp);
         }
-    }
 
     private static String enc(String s) { return URLEncoder.encode(s, StandardCharsets.UTF_8); }
 }

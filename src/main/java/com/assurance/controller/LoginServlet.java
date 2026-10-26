@@ -42,7 +42,6 @@ public class LoginServlet extends HttpServlet {
         req.changeSessionId();                       // protection contre la fixation de session
         session.setAttribute(SessionKeys.UTILISATEUR, u);
 
-        // Redirection selon le rôle
         String cible = switch (u.getRole()) {
             case ADMIN -> "/admin/accueil";
             case AGENT -> "/agent/accueil";

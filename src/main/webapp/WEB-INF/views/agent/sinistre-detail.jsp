@@ -71,7 +71,7 @@
                                     </a>
                                     <span style="color:#666;">
                                         (<fmt:formatNumber value="${p.taille}" pattern="#,##0"/> octets
-                                        — <c:out value="${p.dateDepot}"/>)
+                                        — ${fn:substring(fn:replace(p.dateDepot, 'T', ' '), 0, 16)})
                                     </span>
                                 </li>
                             </c:forEach>
@@ -92,7 +92,7 @@
             <c:forEach var="c" items="${s.commentaires}">
                 <div style="border-left:3px solid #1a3d6d;padding:0.4rem 0.8rem;margin:0.5rem 0;background:#f7faff;">
                     <strong><c:out value="${c.auteur.nom}"/> <c:out value="${c.auteur.prenom}"/></strong>
-                    <em>(<c:out value="${c.dateCreation}"/>)</em>
+                    <em>(${fn:substring(fn:replace(c.dateCreation, 'T', ' '), 0, 16)})</em>
                     <p><c:out value="${c.texte}"/></p>
                 </div>
             </c:forEach>

@@ -7,6 +7,7 @@ import com.assurance.model.Sinistre;
 import com.assurance.model.StatutSinistre;
 import com.assurance.model.Utilisateur;
 import com.assurance.util.SessionKeys;
+import com.assurance.util.Validateur;
 import com.assurance.service.BusinessException;
 import com.assurance.service.SinistreService;
 
@@ -39,20 +40,18 @@ public class TraiterSinistreServlet extends HttpServlet {
         Utilisateur agent = agentConnecte(req, resp);
         if (agent == null) return;
 
-        Long id = parseId(req.getParameter("id"));
-        if (id == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Identifiant de sinistre manquant");
+        Validateur v = new Validateur();
+        Long id = v.id(req.getParameter("id"), "L'identifiant du sinistre");
+        if (!v.estValide()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, v.messages());
             return;
         }
 
-        // findByIdAvecCommentaires : join fetch des commentaires + auteur
-        // + contrat + client → évite LazyInitializationException dans la JSP.
         Sinistre s = sinistreDao.findByIdAvecCommentaires(id);
         if (s == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Sinistre introuvable");
             return;
         }
-
         req.setAttribute("sinistre", s);
         req.setAttribute("statuts", StatutSinistre.values());
         req.setAttribute("transitions", SinistreService.transitionsAutorisees());
@@ -68,70 +67,62 @@ public class TraiterSinistreServlet extends HttpServlet {
         Utilisateur agent = agentConnecte(req, resp);
         if (agent == null) return;
 
-        String action = req.getParameter("action");
-        Long sinistreId = parseId(req.getParameter("sinistreId"));
+        Validateur v = new Validateur();
+        Long sinistreId = v.id(req.getParameter("sinistreId"), "L'identifiant du sinistre");
+        String action   = v.parmi(req.getParameter("action"), "L'action",
+                                  "ajouterCommentaire", "changerStatut", "indemniser");
         if (sinistreId == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Identifiant de sinistre manquant");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, v.messages());
             return;
         }
 
-            try {
-                if ("ajouterCommentaire".equals(action)) {
-                    ajouterCommentaire(req, agent, sinistreId);
-                } else if ("changerStatut".equals(action)) {
-                    changerStatut(req, sinistreId);
-                } else if ("indemniser".equals(action)) {
-                    indemniser(req, sinistreId);
-                } else {
-                    req.getSession().setAttribute("erreur", "Action inconnue : " + action);
-                }
-            } catch (BusinessException | IllegalArgumentException | IllegalStateException e) {
-                req.getSession().setAttribute("erreur", e.getMessage());
-            } catch (Exception e) {
-                log("Erreur lors du traitement du sinistre " + sinistreId, e);
-                req.getSession().setAttribute("erreur", "Erreur technique, merci de réessayer.");
+        try {
+            if (action == null) {
+                req.getSession().setAttribute("erreur", v.messages());
+            } else switch (action) {
+                case "ajouterCommentaire" -> ajouterCommentaire(req, agent, sinistreId);
+                case "changerStatut"      -> changerStatut(req, sinistreId);
+                case "indemniser"         -> indemniser(req, sinistreId);
             }
-
-        // PRG
-        resp.sendRedirect(req.getContextPath() + "/agent/sinistre?id=" + sinistreId);
+        } catch (BusinessException | IllegalArgumentException | IllegalStateException e) {
+            req.getSession().setAttribute("erreur", e.getMessage());
+        } catch (Exception e) {
+            log("Erreur lors du traitement du sinistre " + sinistreId, e);
+            req.getSession().setAttribute("erreur", "Erreur technique, merci de réessayer.");
+        }
+        resp.sendRedirect(req.getContextPath() + "/agent/sinistre?id=" + sinistreId);   // PRG
     }
 
     // ===================== ACTIONS =====================
 
     private void ajouterCommentaire(HttpServletRequest req, Utilisateur agent, Long sinistreId) {
-        String texte = trim(req.getParameter("commentaire"));
-        if (texte.isEmpty()) {
-            throw new IllegalArgumentException("Le commentaire ne peut pas être vide");
-        }
-        if (texte.length() > 2000) {
-            throw new IllegalArgumentException("Le commentaire dépasse 2000 caractères");
-        }
+        Validateur v = new Validateur();
+        String texte = v.texte(req.getParameter("commentaire"), "Le commentaire", 1, 2000, true);
+        if (!v.estValide()) throw new IllegalArgumentException(v.messages());
 
         Commentaire c = new Commentaire();
         c.setTexte(texte);
         c.setDateCreation(LocalDateTime.now());
         c.setAuteur(agent);
-        // Pas de save séparé : ajouterCommentaire charge le sinistre,
-        // pose le lien bidirectionnel et profite de cascade = ALL
-        // (Sinistre.commentaires) pour insérer en une seule transaction.
         sinistreDao.ajouterCommentaire(sinistreId, c);
         req.getSession().setAttribute("message", "Commentaire ajouté.");
     }
 
     private void changerStatut(HttpServletRequest req, Long sinistreId) {
-        StatutSinistre nouveauStatut;
-        try {
-            nouveauStatut = StatutSinistre.valueOf(req.getParameter("statut"));
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new BusinessException("Statut invalide");
-        }
-        // La validation des transitions + montant est faite par le service.
-        sinistreService.changerStatut(sinistreId, nouveauStatut);
-        req.getSession().setAttribute("message", "Statut mis à jour : " + nouveauStatut);
+        Validateur v = new Validateur();
+        StatutSinistre statut = v.choix(StatutSinistre.class, req.getParameter("statut"), "Le statut");
+        if (!v.estValide()) throw new IllegalArgumentException(v.messages());
+
+        sinistreService.changerStatut(sinistreId, statut);   // transitions vérifiées par le service
+        req.getSession().setAttribute("message", "Statut mis à jour : " + statut);
     }
 
     private void indemniser(HttpServletRequest req, Long sinistreId) {
-        BigDecimal montant = parseMontant(req.getParameter("montantIndemnisation"), true);
+        Validateur v = new Validateur();
+        BigDecimal montant = v.montant(req.getParameter("montantIndemnisation"),
+                                       "Le montant d'indemnisation", true, true);
+        if (!v.estValide()) throw new IllegalArgumentException(v.messages());
+
         sinistreService.indemniser(sinistreId, montant);
         req.getSession().setAttribute("message", "Sinistre indemnisé (" + montant + " €).");
     }
@@ -153,39 +144,5 @@ public class TraiterSinistreServlet extends HttpServlet {
             return null;
         }
         return u;
-    }
-
-    private Long parseId(String raw) {
-        if (raw == null || raw.isBlank()) return null;
-        try { return Long.parseLong(raw.trim()); }
-        catch (NumberFormatException e) { return null; }
-    }
-
-    /**
-     * Parse un montant BigDecimal. Si {@code obligatoire}, un montant null
-     * ou ≤ 0 déclenche une exception. La virgule est tolérée comme
-     * séparateur décimal.
-     */
-    private BigDecimal parseMontant(String raw, boolean obligatoire) {
-        String txt = trim(raw);
-        if (txt.isEmpty()) {
-            if (obligatoire) {
-                throw new IllegalArgumentException("Le montant est obligatoire");
-            }
-            return null;
-        }
-        try {
-            BigDecimal v = new BigDecimal(txt.replace(',', '.'));
-            if (v.signum() < 0) {
-                throw new IllegalArgumentException("Le montant ne peut pas être négatif");
-            }
-            return v;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Montant invalide");
-        }
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

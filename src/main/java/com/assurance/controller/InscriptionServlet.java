@@ -4,21 +4,18 @@ import com.assurance.dao.UtilisateurDao;
 import com.assurance.model.Role;
 import com.assurance.model.Utilisateur;
 import com.assurance.util.PasswordUtil;
+import com.assurance.util.Validateur;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 @WebServlet("/inscription")
 public class InscriptionServlet extends HttpServlet {
 
     private static final String VUE = "/WEB-INF/views/inscription.jsp";
-    private static final Pattern EMAIL = Pattern.compile("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)+$");
     private final UtilisateurDao utilisateurDao = new UtilisateurDao();
 
     @Override
@@ -32,28 +29,24 @@ public class InscriptionServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
-        String nom = trim(req.getParameter("nom"));
-        String prenom = trim(req.getParameter("prenom"));
-        String email = trim(req.getParameter("email")).toLowerCase();
-        String mdp = req.getParameter("motDePasse");
-        String confirmation = req.getParameter("confirmation");
+        // ---- Validation commune (exigée par le sujet) ----
+        Validateur v = new Validateur();
+        String nom    = v.texte(req.getParameter("nom"),    "Le nom",    2, 100, true);
+        String prenom = v.texte(req.getParameter("prenom"), "Le prénom", 2, 100, true);
+        String email  = v.email(req.getParameter("email"),  "L'email");
+        String mdp    = v.motDePasse(req.getParameter("motDePasse"), req.getParameter("confirmation"));
 
-        // ---- Validation côté servlet (exigée par le sujet) ----
-        Map<String, String> erreurs = new LinkedHashMap<>();
-        if (nom.isEmpty() || nom.length() > 100) erreurs.put("nom", "Nom obligatoire (100 caractères max).");
-        if (prenom.isEmpty() || prenom.length() > 100) erreurs.put("prenom", "Prénom obligatoire (100 caractères max).");
-        if (!EMAIL.matcher(email).matches() || email.length() > 255) erreurs.put("email", "Email invalide.");
-        else if (utilisateurDao.existsByEmail(email)) erreurs.put("email", "Cet email est déjà utilisé.");
-        if (mdp == null || mdp.length() < 8) erreurs.put("motDePasse", "8 caractères minimum.");
-        else if (!mdp.equals(confirmation)) erreurs.put("confirmation", "Les mots de passe ne correspondent pas.");
+        // ---- Règle métier : email unique ----
+        if (email != null && utilisateurDao.existsByEmail(email))
+            v.ajouter("Cet email est déjà utilisé.");
 
-        if (!erreurs.isEmpty()) {
-            req.setAttribute("erreurs", erreurs);
-            req.getRequestDispatcher(VUE).forward(req, resp);   // les champs sont réaffichés via ${param.xxx}
+        if (!v.estValide()) {
+            req.setAttribute("erreurs", v.getErreurs());
+            req.getRequestDispatcher(VUE).forward(req, resp);   // champs réaffichés via ${param.xxx}
             return;
         }
 
-        // ---- Création : toujours en CLIENT (jamais de rôle venant du formulaire) ----
+        // ---- Création : toujours CLIENT (jamais de rôle venant du formulaire) ----
         Utilisateur u = new Utilisateur();
         u.setNom(nom);
         u.setPrenom(prenom);
@@ -64,16 +57,13 @@ public class InscriptionServlet extends HttpServlet {
 
         try {
             utilisateurDao.save(u);
-        } catch (RuntimeException e) {   // ex. deux inscriptions simultanées avec le même email (contrainte UNIQUE)
-            erreurs.put("email", "Cet email est déjà utilisé.");
-            req.setAttribute("erreurs", erreurs);
+        } catch (RuntimeException e) {   // contrainte UNIQUE (inscriptions simultanées)
+            v.ajouter("Cet email est déjà utilisé.");
+            req.setAttribute("erreurs", v.getErreurs());
             req.getRequestDispatcher(VUE).forward(req, resp);
             return;
         }
 
-        // Redirection (pattern Post/Redirect/Get : évite une double inscription si F5)
-        resp.sendRedirect(req.getContextPath() + "/login?inscrit=1");
+        resp.sendRedirect(req.getContextPath() + "/login?inscrit=1");   // PRG
     }
-
-    private static String trim(String s) { return s == null ? "" : s.trim(); }
 }

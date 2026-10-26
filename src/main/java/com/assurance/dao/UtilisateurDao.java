@@ -57,9 +57,10 @@ public class UtilisateurDao extends GenericDao<Utilisateur, Long> {
 
     // ===================== RECHERCHE =====================
 
-    /** Recherche par nom, prénom ou email. */
+        /** Recherche par nom, prénom ou email. */
     public List<Utilisateur> search(String motCle) {
-        String pattern = "%" + motCle.toLowerCase().trim() + "%";
+        String mot = (motCle == null) ? "" : motCle.toLowerCase().trim();
+        String pattern = "%" + mot + "%";
         return inSession(session ->
                 session.createQuery(
                         "from Utilisateur u " +
