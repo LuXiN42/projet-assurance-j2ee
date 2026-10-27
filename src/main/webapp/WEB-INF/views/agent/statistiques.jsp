@@ -4,14 +4,14 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>Statistiques — Agent · B'Care</title>
+    <title>Statistiques agent · B'Care</title>
     <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
 <main class="page">
-    <h1>Tableau de bord — Agent</h1>
+    <h1>Tableau de bord agent</h1>
 
     <!-- KPI : Clients -->
     <section>

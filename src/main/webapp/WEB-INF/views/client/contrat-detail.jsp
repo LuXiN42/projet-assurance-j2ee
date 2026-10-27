@@ -11,7 +11,7 @@
 <%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
 <main class="page">
 <p><a href="${ctx}/client/contrats">← Mes contrats</a></p>
-<h1>Contrat <c:out value="${contrat.numeroContrat}"/> — <em>${contrat.statut}</em></h1>
+<h1>Contrat <c:out value="${contrat.numeroContrat}"/> : <em>${contrat.statut}</em></h1>
 
 <table cellpadding="4">
   <tr><th align="left">Type d'assurance</th><td><c:out value="${contrat.typeAssurance.nom}"/></td></tr>

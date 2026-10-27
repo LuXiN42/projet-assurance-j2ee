@@ -1,6 +1,6 @@
 -- ============================================================================
--- schema.sql  —  Schéma de la base `assurance_db` (MySQL 8 / MariaDB 10)
--- Projet J2EE Assurance — Hibernate hbm2ddl = update compatible.
+-- schema.sql : schéma de la base `assurance_db` (MySQL 8 / MariaDB 10)
+-- Projet J2EE Assurance, compatible avec Hibernate hbm2ddl = update compatible.
 -- ============================================================================
 -- Généré à partir des entités JPA du package com.assurance.model :
 --   Utilisateur, Contrat, TypeAssurance, Garantie, Sinistre, Paiement,

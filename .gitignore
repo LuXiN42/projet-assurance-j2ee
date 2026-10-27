@@ -28,3 +28,5 @@ replay_pid*
 deploy*.bat
 
 src/main/resources/ia.properties
+# Fichiers générés par les extensions VS Code
+.github/

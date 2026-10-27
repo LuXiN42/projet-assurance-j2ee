@@ -19,7 +19,7 @@
       <td><c:out value="${ct.numeroContrat}"/></td>
       <td><c:out value="${ct.typeAssurance.nom}"/></td>
       <td>${ct.dateDebut}</td>
-      <td>${empty ct.dateFin ? '—' : ct.dateFin}</td>
+      <td>${empty ct.dateFin ? '-' : ct.dateFin}</td>
       <td>${ct.prime} €</td>
       <td>${ct.statut}</td>
       <td><a href="${ctx}/client/contrats/detail?id=${ct.id}">Voir</a></td>

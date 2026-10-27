@@ -15,7 +15,7 @@ import java.util.Properties;
  * <p>Les paramètres de connexion sont lus depuis le classpath
  * (ordre de priorité) :</p>
  * <ol>
- *   <li>{@code db.properties} — clés : {@code db.url}, {@code db.user}, {@code db.password}</li>
+ *   <li>{@code db.properties}, clés : {@code db.url}, {@code db.user}, {@code db.password}</li>
  *   <li>En repli : {@code hibernate.cfg.xml} (propriétés
  *       {@code hibernate.connection.url|username|password})</li>
  *   <li>En dernier repli : valeurs par défaut alignées sur la config Hibernate.</li>
@@ -33,14 +33,14 @@ public final class JdbcUtil {
     /** Driver JDBC MySQL 8.x (aligné sur hibernate.cfg.xml). */
     private static final String DEFAULT_DRIVER = "com.mysql.cj.jdbc.Driver";
 
-    /** URL JDBC par défaut — alignée sur hibernate.cfg.xml. */
+    /** URL JDBC par défaut, alignée sur hibernate.cfg.xml. */
     private static final String DEFAULT_URL =
             "jdbc:mysql://localhost:3306/assurance_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
-    /** Utilisateur par défaut — aligné sur hibernate.cfg.xml. */
+    /** Utilisateur par défaut, aligné sur hibernate.cfg.xml. */
     private static final String DEFAULT_USER = "assurance";
 
-    /** Mot de passe par défaut — aligné sur hibernate.cfg.xml. */
+    /** Mot de passe par défaut, aligné sur hibernate.cfg.xml. */
     private static final String DEFAULT_PASSWORD = "assuranceGroupeO";
 
     private static String url;
@@ -72,7 +72,7 @@ public final class JdbcUtil {
         } catch (ClassNotFoundException e) {
             throw new ExceptionInInitializerError(
                     "Driver JDBC introuvable : " + DEFAULT_DRIVER
-                            + " — ajouter mysql-connector-j au pom.xml.");
+                            + " : ajouter mysql-connector-j au pom.xml.");
         }
     }
 

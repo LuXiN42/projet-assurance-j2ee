@@ -19,11 +19,11 @@
 <form method="post">
   <p><label>Contrat :
     <select name="contratId" id="contratSel" required>
-      <option value="">— choisir —</option>
+      <option value="">Choisir</option>
       <c:forEach var="ct" items="${contrats}">
         <c:set var="sel" value="${param.contratId == ct.id}"/>
         <option value="${ct.id}" data-prime="${ct.prime}" ${sel ? 'selected' : ''}>
-          <c:out value="${ct.numeroContrat}"/> — <c:out value="${ct.client.nom}"/> <c:out value="${ct.client.prenom}"/> (${ct.statut})
+          <c:out value="${ct.numeroContrat}"/> - <c:out value="${ct.client.nom}"/> <c:out value="${ct.client.prenom}"/> (${ct.statut})
         </option>
       </c:forEach>
     </select></label></p>
@@ -37,7 +37,7 @@
 
   <p><label>Mode de paiement :
     <select name="mode">
-      <option value="">—</option>
+      <option value="">Aucun</option>
       <c:forEach var="m" items="${modes}">
         <option value="${m}" ${param.mode == m ? 'selected' : ''}><c:out value="${m}"/></option>
       </c:forEach>
