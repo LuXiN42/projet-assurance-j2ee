@@ -145,23 +145,57 @@ Compiler le projet :
 mvn clean package
 ```
 
-Le fichier produit est `target/assurance.war`. Définir `TOMCAT_HOME` avec le chemin vers le dossier d'installation de Tomcat, puis copier le WAR dans son dossier `webapps` et démarrer Tomcat.
+Le fichier produit est `target/assurance.war`.
+
+#### 5.1 Définir le chemin de Tomcat
+
+On appelle `TOMCAT_HOME` le dossier dans lequel Tomcat est installé (celui qui contient les dossiers `bin`, `webapps`, `logs`...). Par exemple : `/opt/tomcat`, `~/apache-tomcat-10.1.30` ou `C:\apache-tomcat-10.1.30`.
+
+- **Linux / Mac** (valable pour le terminal en cours) :
+  ```bash
+  export TOMCAT_HOME=~/apache-tomcat-10.1.30
+  ```
+  Pour que la variable soit conservée à chaque ouverture de terminal, ajouter cette même ligne `export` à la fin du fichier `~/.bashrc` (ou `~/.zshrc` sur Mac), puis exécuter `source ~/.bashrc`.
+
+- **Windows (cmd)** (valable pour la fenêtre en cours) :
+  ```cmd
+  set CATALINA_HOME=C:\apache-tomcat-10.1.30
+  ```
+  Pour une variable permanente : Paramètres système avancés, Variables d'environnement, Nouvelle, nom `CATALINA_HOME`, valeur le chemin de Tomcat.
+
+Vérification (Linux / Mac) :
+
+```bash
+echo $TOMCAT_HOME
+ls $TOMCAT_HOME/webapps
+```
+
+La commande doit afficher le chemin de Tomcat puis le contenu de `webapps`. Sinon, le chemin est incorrect.
+
+Il est aussi possible de se passer de la variable en écrivant directement le chemin dans la commande :
+
+```bash
+cp target/assurance.war ~/apache-tomcat-10.1.30/webapps/
+```
+
+#### 5.2 Copier le war et démarrer Tomcat
 
 - **Linux / Mac :**
   ```bash
   cp target/assurance.war $TOMCAT_HOME/webapps/
   $TOMCAT_HOME/bin/startup.sh
   ```
-- **Windows (cmd) :** définir `CATALINA_HOME` avec le chemin vers le dossier d'installation de Tomcat, puis exécuter :
+- **Windows (cmd) :**
   ```cmd
   copy target\assurance.war %CATALINA_HOME%\webapps\
   %CATALINA_HOME%\bin\startup.bat
   ```
 
-Pour un redéploiement propre, supprimer l'ancien dossier `webapps/assurance/` et l'ancien fichier `webapps/assurance.war` avant de recopier le nouveau WAR. Les logs sont disponibles dans `logs/catalina.out`. Pour arrêter Tomcat, utiliser `shutdown.sh` (Linux / Mac) ou `shutdown.bat` (Windows), dans le dossier `bin` de Tomcat.
+Si le script `startup.sh` n'est pas exécutable, lancer une fois `chmod +x $TOMCAT_HOME/bin/*.sh`.
+
+Pour un redéploiement propre, supprimer l'ancien dossier `webapps/assurance/` et l'ancien fichier `webapps/assurance.war` avant de recopier le nouveau WAR. Les logs sont dans `logs/catalina.out`. Pour arrêter Tomcat, utiliser `shutdown.sh` (Linux / Mac) ou `shutdown.bat` (Windows), dans le dossier `bin` de Tomcat.
 
 L'application est disponible sur <http://localhost:8080/assurance>.
-
 ## Comptes de test
 
 Tous les comptes de test ont le mot de passe `Password123!`.
