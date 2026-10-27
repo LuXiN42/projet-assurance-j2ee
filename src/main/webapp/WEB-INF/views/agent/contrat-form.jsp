@@ -25,16 +25,16 @@
       <input name="numeroContrat" value="<c:out value='${param.numeroContrat}'/>"></label></p>
     <p><label>Client :
       <select name="clientId" required>
-        <option value="">— choisir —</option>
+        <option value="">Choisir</option>
         <c:forEach var="u" items="${clients}">
-          <option value="${u.id}" ${param.clientId == u.id ? 'selected' : ''}><c:out value="${u.nom}"/> <c:out value="${u.prenom}"/> — <c:out value="${u.email}"/></option>
+          <option value="${u.id}" ${param.clientId == u.id ? 'selected' : ''}><c:out value="${u.nom}"/> <c:out value="${u.prenom}"/> - <c:out value="${u.email}"/></option>
         </c:forEach>
       </select></label></p>
   </c:if>
 
   <p><label>Type d'assurance :
     <select name="typeId" id="typeSelect" required>
-        <option value="">— choisir —</option>
+        <option value="">Choisir</option>
         <c:forEach var="t" items="${types}">
         <c:set var="sel" value="${not empty param.typeId ? param.typeId == t.id : (edition && contrat.typeAssurance.id == t.id)}"/>
         <option value="${t.id}" data-prix="${t.prixBase}" ${sel ? 'selected' : ''}><c:out value="${t.nom}"/> (${t.prixBase} €)</option>

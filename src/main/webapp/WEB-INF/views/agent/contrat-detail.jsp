@@ -10,7 +10,7 @@
 <%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
 <main class="page">
 <p><a href="${ctx}/agent/contrats">← Liste des contrats</a></p>
-<h1>Contrat <c:out value="${contrat.numeroContrat}"/> — <em>${contrat.statut}</em></h1>
+<h1>Contrat <c:out value="${contrat.numeroContrat}"/> : <em>${contrat.statut}</em></h1>
 
 <c:if test="${not empty message}"><p class="alerte ok"><c:out value="${message}"/></p></c:if>
 <c:if test="${not empty erreur}"><p class="alerte ko"><c:out value="${erreur}"/></p></c:if>
@@ -43,7 +43,7 @@
   <form method="post" action="${ctx}/agent/contrats/garanties">
     <input type="hidden" name="contratId" value="${contrat.id}">
     <select name="garantieId" required>
-      <option value="">— ajouter une garantie —</option>
+      <option value="">Ajouter une garantie</option>
       <c:forEach var="g" items="${garantiesDispo}">
         <option value="${g.id}"><c:out value="${g.nom}"/></option>
       </c:forEach>

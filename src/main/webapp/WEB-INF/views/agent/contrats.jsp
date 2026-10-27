@@ -17,7 +17,7 @@
 <c:if test="${not empty clientFiltre}">
   <p style="background:#eef;padding:6px">
     Contrats de <strong><c:out value="${clientFiltre.prenom} ${clientFiltre.nom}"/></strong>
-    — <a href="${pageContext.request.contextPath}/agent/contrats">Voir tous les contrats</a>
+    - <a href="${pageContext.request.contextPath}/agent/contrats">Voir tous les contrats</a>
   </p>
 </c:if>
 
@@ -25,13 +25,13 @@
   <input name="numero" placeholder="N° contrat" value="<c:out value='${param.numero}'/>">
   <input name="nomClient" placeholder="Nom client" value="<c:out value='${param.nomClient}'/>">
   <select name="typeId">
-    <option value="">— Type —</option>
+    <option value="">Tous les types</option>
     <c:forEach var="t" items="${types}">
       <option value="${t.id}" ${param.typeId == t.id ? 'selected' : ''}><c:out value="${t.nom}"/></option>
     </c:forEach>
   </select>
   <select name="statut">
-    <option value="">— Statut —</option>
+    <option value="">Tous les statuts</option>
     <c:forEach var="s" items="${statuts}">
       <option value="${s}" ${param.statut == s ? 'selected' : ''}>${s}</option>
     </c:forEach>

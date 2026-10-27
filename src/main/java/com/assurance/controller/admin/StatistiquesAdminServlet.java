@@ -26,7 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * Tableau de bord statistiques (T28) — version ADMIN.
+ * Tableau de bord statistiques (T28), version ADMIN.
  */
 @WebServlet("/admin/statistiques")
 public class StatistiquesAdminServlet extends HttpServlet {

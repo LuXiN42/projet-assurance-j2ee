@@ -29,7 +29,7 @@
     <select name="contratId" required>
         <c:forEach var="ct" items="${contrats}">
             <option value="${ct.id}" ${param.contratId == ct.id ? 'selected' : ''}>
-                <c:out value="${ct.numeroContrat}"/> – <c:out value="${ct.typeAssurance.nom}"/>
+                <c:out value="${ct.numeroContrat}"/> - <c:out value="${ct.typeAssurance.nom}"/>
             </option>
         </c:forEach>
     </select><br><br>

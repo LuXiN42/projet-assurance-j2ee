@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.util.*;
 
 /**
- * Tableau de bord statistiques (T28) — version AGENT.
+ * Tableau de bord statistiques (T28), version AGENT.
  */
 @WebServlet("/agent/statistiques")
 public class StatistiquesAgentServlet extends HttpServlet {

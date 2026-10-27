@@ -36,7 +36,7 @@
         <tr><th>Montant estimé</th>
             <td><c:out value="${s.montantEstime}"/> €</td></tr>
         <tr><th>Montant indemnisé</th>
-            <td><c:choose><c:when test="${empty s.montantIndemnisation}">—</c:when><c:otherwise><c:out value="${s.montantIndemnisation}"/> €</c:otherwise></c:choose></td></tr>
+            <td><c:choose><c:when test="${empty s.montantIndemnisation}">-</c:when><c:otherwise><c:out value="${s.montantIndemnisation}"/> €</c:otherwise></c:choose></td></tr>
         <tr><th>Contrat</th>
             <td><c:out value="${s.contrat.numeroContrat}"/></td></tr>
         <tr><th>Client</th>
@@ -58,8 +58,8 @@
                                         <c:out value="${p.nomOriginal}"/>
                                     </a>
                                     <span class="discret">
-                                        (<fmt:formatNumber value="${p.taille}" pattern="#,##0"/> octets
-                                        — ${fn:substring(fn:replace(p.dateDepot, 'T', ' '), 0, 16)})
+                                        (<fmt:formatNumber value="${p.taille}" pattern="#,##0"/> octets,
+                                        ${fn:substring(fn:replace(p.dateDepot, 'T', ' '), 0, 16)})
                                     </span>
                                 </li>
                             </c:forEach>
