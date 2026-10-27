@@ -3,10 +3,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Utilisateur</title>
+    <title>Utilisateur · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
 </head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 
 <p><a href="${ctx}/admin/utilisateurs">← Retour à la liste</a></p>
 
@@ -20,7 +22,7 @@
 </c:choose>
 
 <c:if test="${not empty erreurs}">
-    <ul style="color:red">
+    <ul class="alerte ko">
         <c:forEach var="e" items="${erreurs}">
             <li><c:out value="${e}"/></li>
         </c:forEach>
@@ -70,6 +72,7 @@
 
     <p><button type="submit">Enregistrer</button></p>
 </form>
-
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
 </body>
 </html>

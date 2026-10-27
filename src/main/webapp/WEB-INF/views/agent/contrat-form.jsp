@@ -2,13 +2,19 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="edition" value="${not empty contrat}"/>
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><title>${edition ? 'Modifier' : 'Nouveau'} contrat</title></head>
+<html lang="fr">
+<head>
+    <title>${edition ? 'Modifier' : 'Nouveau'} contrat · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
+</head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 <p><a href="${ctx}/agent/contrats">← Liste des contrats</a></p>
 <h1>${edition ? 'Modifier le contrat '.concat(contrat.numeroContrat) : 'Nouveau contrat'}</h1>
 
 <c:if test="${not empty erreurs}">
-  <ul style="color:red"><c:forEach var="e" items="${erreurs}"><li><c:out value="${e}"/></li></c:forEach></ul>
+  <ul class="alerte ko"><c:forEach var="e" items="${erreurs}"><li><c:out value="${e}"/></li></c:forEach></ul>
 </c:if>
 
 <form method="post">
@@ -65,5 +71,7 @@
     if (prix) primeInput.value = prix;
   });
 </script>
-
-</body></html>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
+</body>
+</html>

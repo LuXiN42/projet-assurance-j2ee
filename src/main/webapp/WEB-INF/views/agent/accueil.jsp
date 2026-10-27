@@ -1,25 +1,67 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Espace agent</title>
+    <title>Espace agent · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
 </head>
 <body>
-    <h1>Espace agent</h1>
-    <p>Bonjour <c:out value="${sessionScope.utilisateur.prenom}"/> !</p>
+<c:set var="navSombre" value="${true}"/>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main>
+    <header class="espace-hero">
+        <div class="aurore"><span></span><span></span><span></span></div>
+        <div class="espace-in">
+            <span class="pastille apparait d1"><i></i>Espace agent</span>
+            <h1 class="apparait d2">Bonjour <c:out value="${sessionScope.utilisateur.prenom}"/>,<br><em>prêt pour la journée ?</em></h1>
+            <p class="apparait d3">Gérez vos clients, leurs contrats et les sinistres à traiter.</p>
+        </div>
+    </header>
 
-    <ul>
-        <li><a href="${ctx}/agent/clients">Consulter les clients</a></li>
-        <li><a href="${pageContext.request.contextPath}/agent/contrats">Gérer les contrats</a></li>
-        <li><a href="${ctx}/agent/sinistres">Gérer les sinistres</a></li>
-        <li><a href="${ctx}/agent/garanties">Gérer les garanties</a></li>        
-        <li><a href="${ctx}/agent/paiements">Paiements</a></li>
-        <li><a href="${ctx}/agent/paiements/form">Enregistrer un paiement</a></li>
-        <li><a href="${pageContext.request.contextPath}/agent/statistiques">Statistiques</a></li>
-    </ul>
-
-    <a href="${pageContext.request.contextPath}/logout">Se déconnecter</a>
+    <div class="tuiles quatre">
+        <a class="tuile" href="${ctx}/agent/clients">
+            <span class="ico-xl"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg></span>
+            <b>Clients</b>
+            <small>Consulter les fiches clients</small>
+        </a>
+        <a class="tuile" href="${ctx}/agent/contrats">
+            <span class="ico-xl"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span>
+            <b>Contrats</b>
+            <small>Rechercher et gérer les contrats</small>
+        </a>
+        <a class="tuile mise-en-avant" href="${ctx}/agent/contrats/form">
+            <span class="ico-xl"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span>
+            <b>Nouveau contrat</b>
+            <small>Souscrire pour un client</small>
+        </a>
+        <a class="tuile" href="${ctx}/agent/sinistres">
+            <span class="ico-xl"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <b>Sinistres</b>
+            <small>Analyser et traiter les dossiers</small>
+        </a>
+        <a class="tuile" href="${ctx}/agent/garanties">
+            <span class="ico-xl"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></span>
+            <b>Garanties</b>
+            <small>Le catalogue des garanties</small>
+        </a>
+        <a class="tuile" href="${ctx}/agent/paiements">
+            <span class="ico-xl"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg></span>
+            <b>Paiements</b>
+            <small>Suivre les règlements</small>
+        </a>
+        <a class="tuile" href="${ctx}/agent/paiements/form">
+            <span class="ico-xl"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg></span>
+            <b>Enregistrer un paiement</b>
+            <small>Saisir un nouveau règlement</small>
+        </a>
+        <a class="tuile" href="${ctx}/agent/statistiques">
+            <span class="ico-xl"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+            <b>Statistiques</b>
+            <small>Votre tableau de bord</small>
+        </a>
+    </div>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
 </body>
 </html>

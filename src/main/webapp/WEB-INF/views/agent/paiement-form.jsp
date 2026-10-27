@@ -1,13 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><title>Nouveau paiement</title></head>
+<html lang="fr">
+<head>
+    <title>Nouveau paiement · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
+</head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 <p><a href="${ctx}/agent/paiements">← Paiements</a></p>
 <h1>Enregistrer un paiement</h1>
 
 <c:if test="${not empty erreurs}">
-  <ul style="color:red"><c:forEach var="e" items="${erreurs}"><li><c:out value="${e}"/></li></c:forEach></ul>
+  <ul class="alerte ko"><c:forEach var="e" items="${erreurs}"><li><c:out value="${e}"/></li></c:forEach></ul>
 </c:if>
 
 <form method="post">
@@ -55,4 +61,7 @@
     if (prime && !montant.value) montant.value = prime;
   });
 </script>
-</body></html>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
+</body>
+</html>

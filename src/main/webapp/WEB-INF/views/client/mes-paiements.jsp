@@ -1,8 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><title>Mes paiements</title></head>
+<html lang="fr">
+<head>
+    <title>Mes paiements · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
+</head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 <h1>Mes paiements</h1>
 
 <h2>Échéances (${jours} prochains jours ou en retard)</h2>
@@ -52,4 +58,7 @@
         <td>${p.modePaiement}</td><td>${p.statut}</td></tr>
   </c:forEach>
 </table>
-</body></html>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
+</body>
+</html>

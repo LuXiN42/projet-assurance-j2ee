@@ -3,12 +3,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Sinistres</title>
+    <title>Sinistres · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
 </head>
 <body>
-
-<p><a href="${ctx}/agent/accueil">← Accueil agent</a></p>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 
 <h1>Sinistres</h1>
 
@@ -55,6 +55,7 @@
         </table>
     </c:otherwise>
 </c:choose>
-
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
 </body>
 </html>

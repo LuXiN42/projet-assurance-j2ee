@@ -1,13 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><title>Paiements</title></head>
+<html lang="fr">
+<head>
+    <title>Paiements · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
+</head>
 <body>
-
-<p><a href="${ctx}/agent/accueil">← Accueil agent</a></p>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 
 <h1>Paiements</h1>
-<c:if test="${not empty param.msg}"><p style="color:green"><c:out value="${param.msg}"/></p></c:if>
+<c:if test="${not empty param.msg}"><p class="alerte ok"><c:out value="${param.msg}"/></p></c:if>
 
 <form method="get">
   Statut :
@@ -46,4 +50,7 @@
     </tr>
   </c:forEach>
 </table>
-</body></html>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
+</body>
+</html>

@@ -3,10 +3,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Clients</title>
+    <title>Clients · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
 </head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
     <h1>Clients</h1>
 
     <form method="get" action="${ctx}/agent/clients">
@@ -49,7 +51,7 @@
             </table>
         </c:otherwise>
     </c:choose>
-
-    <p><a href="${ctx}/agent/accueil">Retour à l'accueil</a></p>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
 </body>
 </html>

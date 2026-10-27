@@ -1,13 +1,18 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><title>Contrats</title></head>
+<html lang="fr">
+<head>
+    <title>Contrats · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
+</head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 <h1>Contrats</h1>
-<p><a href="${pageContext.request.contextPath}/agent/accueil">← Accueil</a> |
-   <a href="${pageContext.request.contextPath}/agent/contrats/form">+ Nouveau contrat</a></p>
+<p><a href="${pageContext.request.contextPath}/agent/contrats/form">+ Nouveau contrat</a></p>
 
-<c:if test="${not empty message}"><p style="color:green"><c:out value="${message}"/></p></c:if>
+<c:if test="${not empty message}"><p class="alerte ok"><c:out value="${message}"/></p></c:if>
 
 <c:if test="${not empty clientFiltre}">
   <p style="background:#eef;padding:6px">
@@ -49,4 +54,7 @@
   </c:forEach>
   <c:if test="${empty contrats}"><tr><td colspan="8">Aucun contrat.</td></tr></c:if>
 </table>
-</body></html>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
+</body>
+</html>

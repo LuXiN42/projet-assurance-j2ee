@@ -2,13 +2,19 @@
 <%@ taglib prefix="c"  uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>Déclarer un sinistre</title></head>
+<html lang="fr">
+<head>
+    <title>Déclarer un sinistre · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
+</head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 <h2>Déclarer un sinistre</h2>
 
 <%-- 1. La servlet envoie "erreur" (une chaîne), échappée contre le XSS --%>
 <c:if test="${not empty erreur}">
-    <p style="color:red"><c:out value="${erreur}"/></p>
+    <p class="alerte ko"><c:out value="${erreur}"/></p>
 </c:if>
 
 <c:choose>
@@ -54,6 +60,7 @@
 </form>
 </c:otherwise>
 </c:choose>
-
-<p><a href="${pageContext.request.contextPath}/client/accueil">← Retour à l'accueil</a></p>
-</body></html>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
+</body>
+</html>

@@ -3,28 +3,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Mon profil</title>
+    <title>Mon profil · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
 </head>
 <body>
-
-<p><a href="${ctx}/client/accueil">← Accueil</a></p>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 
 <h1>Mon profil</h1>
 
 <c:if test="${not empty message}">
-    <p style="color:green"><c:out value="${message}"/></p>
+    <p class="alerte ok"><c:out value="${message}"/></p>
 </c:if>
 
 <c:if test="${not empty erreurs}">
-    <ul style="color:red">
+    <ul class="alerte ko">
         <c:forEach var="e" items="${erreurs}">
             <li><c:out value="${e}"/></li>
         </c:forEach>
     </ul>
 </c:if>
 
-<form method="post" action="${ctx}/client/profil">
+<form method="post" action="${ctx}/profil">
 
     <h2>Mes informations</h2>
 
@@ -81,6 +81,7 @@
 
     <p><button type="submit">Enregistrer</button></p>
 </form>
-
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
 </body>
 </html>

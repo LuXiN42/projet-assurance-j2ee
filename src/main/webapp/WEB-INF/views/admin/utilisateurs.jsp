@@ -3,20 +3,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Utilisateurs</title>
+    <title>Utilisateurs · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
 </head>
 <body>
-
-<p><a href="${ctx}/admin/accueil">← Accueil admin</a></p>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 
 <h1>Utilisateurs</h1>
 
 <c:if test="${not empty message}">
-    <p style="color:green"><c:out value="${message}"/></p>
+    <p class="alerte ok"><c:out value="${message}"/></p>
 </c:if>
 <c:if test="${not empty erreur}">
-    <p style="color:red"><c:out value="${erreur}"/></p>
+    <p class="alerte ko"><c:out value="${erreur}"/></p>
 </c:if>
 
 <p><a href="${ctx}/admin/utilisateurs/form">+ Créer un utilisateur</a></p>
@@ -70,6 +70,7 @@
         </table>
     </c:otherwise>
 </c:choose>
-
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
 </body>
 </html>

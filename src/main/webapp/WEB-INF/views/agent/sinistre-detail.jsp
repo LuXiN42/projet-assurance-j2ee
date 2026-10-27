@@ -5,33 +5,21 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Détail du sinistre <c:out value="${sinistre.numeroSinistre}"/></title>
-    <style>
-        body { font-family: system-ui, sans-serif; margin: 2rem; color: #222; }
-        h1, h2 { color: #1a3d6d; }
-        .carte { border: 1px solid #ccd; border-radius: 6px; padding: 1rem; margin: 1rem 0; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ccd; padding: 0.4rem 0.6rem; text-align: left; }
-        th { background: #eef; }
-        .ok { background: #e6ffe6; padding: 0.5rem 1rem; border-radius: 4px; }
-        .err { background: #ffe6e6; padding: 0.5rem 1rem; border-radius: 4px; color: #900; }
-        label { display: block; margin-top: 0.5rem; }
-        input, textarea, select { padding: 0.3rem; min-width: 280px; }
-        textarea { min-height: 80px; }
-        button { padding: 0.4rem 1rem; margin-top: 0.5rem; cursor: pointer; }
-    </style>
+    <title>Détail du sinistre <c:out value="${sinistre.numeroSinistre}"/> · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
 </head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 
 <c:set var="s" value="${sinistre}" />
 
 <c:if test="${not empty sessionScope.message}">
-    <div class="ok"><c:out value="${sessionScope.message}"/></div>
+    <div class="alerte ok"><c:out value="${sessionScope.message}"/></div>
     <c:remove var="message" scope="session"/>
 </c:if>
 <c:if test="${not empty sessionScope.erreur}">
-    <div class="err"><c:out value="${sessionScope.erreur}"/></div>
+    <div class="alerte ko"><c:out value="${sessionScope.erreur}"/></div>
     <c:remove var="erreur" scope="session"/>
 </c:if>
 
@@ -61,7 +49,7 @@
                         <em>Aucune pièce justificative.</em>
                     </c:when>
                     <c:otherwise>
-                        <ul style="margin:0; padding-left:1rem;">
+                        <ul class="pieces">
                             <c:forEach var="p" items="${s.pieces}">
                                 <li>
                                     <a href="<c:url value='/piece'>
@@ -69,7 +57,7 @@
                                               </c:url>">
                                         <c:out value="${p.nomOriginal}"/>
                                     </a>
-                                    <span style="color:#666;">
+                                    <span class="discret">
                                         (<fmt:formatNumber value="${p.taille}" pattern="#,##0"/> octets
                                         — ${fn:substring(fn:replace(p.dateDepot, 'T', ' '), 0, 16)})
                                     </span>
@@ -90,7 +78,7 @@
         </c:when>
         <c:otherwise>
             <c:forEach var="c" items="${s.commentaires}">
-                <div style="border-left:3px solid #1a3d6d;padding:0.4rem 0.8rem;margin:0.5rem 0;background:#f7faff;">
+                <div class="commentaire">
                     <strong><c:out value="${c.auteur.nom}"/> <c:out value="${c.auteur.prenom}"/></strong>
                     <em>(${fn:substring(fn:replace(c.dateCreation, 'T', ' '), 0, 16)})</em>
                     <p><c:out value="${c.texte}"/></p>
@@ -145,8 +133,7 @@
     </form>
     <p><em>Réservé au statut ACCEPTE. Passe automatiquement le sinistre à INDEMNISE.</em></p>
 </div>
-
-<p><a href="<c:url value='/agent/accueil'/>">← Retour à l'accueil agent</a></p>
-
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
 </body>
 </html>

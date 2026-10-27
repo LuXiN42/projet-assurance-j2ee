@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/client/profil")
+@WebServlet("/profil")
 public class ProfilServlet extends HttpServlet {
 
     private UtilisateurDao utilisateurDao = new UtilisateurDao();
@@ -26,7 +26,6 @@ public class ProfilServlet extends HttpServlet {
 
         Utilisateur connecte = (Utilisateur) request.getSession().getAttribute(SessionKeys.UTILISATEUR);
 
-        // On relit le compte en base pour afficher les infos à jour
         Utilisateur compte = utilisateurDao.findById(connecte.getId());
 
         request.setAttribute("compte", compte);
@@ -65,7 +64,6 @@ public class ProfilServlet extends HttpServlet {
         }
 
         if (!v.estValide()) {
-            // On réaffiche le formulaire avec ce que le client avait tapé
             compte.setNom(nom);
             compte.setPrenom(prenom);
             compte.setEmail(email);
@@ -90,7 +88,7 @@ public class ProfilServlet extends HttpServlet {
         // On met aussi à jour la copie rangée dans la session
         request.getSession().setAttribute(SessionKeys.UTILISATEUR, compte);
 
-        response.sendRedirect(request.getContextPath() + "/client/profil?message="
+        response.sendRedirect(request.getContextPath() + "/profil?message="
                 + FormUtil.enc("Profil mis à jour."));
     }
 }

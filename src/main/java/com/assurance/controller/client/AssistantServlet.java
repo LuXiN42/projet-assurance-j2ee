@@ -15,6 +15,8 @@ import com.assurance.service.BusinessException;
 import com.assurance.util.FormUtil;
 import com.assurance.util.SessionKeys;
 import com.assurance.util.Validateur;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -26,7 +28,6 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("/client/assistant")
 public class AssistantServlet extends HttpServlet {
 
-    // nom de l'attribut de session qui garde la conversation
     private static final String HISTORIQUE = "historiqueIA";
     // on garde seulement les 20 derniers messages pour ne pas envoyer trop de texte
     private static final int MAX_MESSAGES = 20;
@@ -38,6 +39,21 @@ public class AssistantServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // la bulle Bibi récupère la conversation en JSON
+        if ("json".equals(request.getParameter("format"))) {
+            JsonArray messages = new JsonArray();
+            for (String[] m : getHistorique(request.getSession())) {
+                JsonObject o = new JsonObject();
+                o.addProperty("role", m[0]);
+                o.addProperty("texte", m[1]);
+                messages.add(o);
+            }
+            JsonObject json = new JsonObject();
+            json.add("messages", messages);
+            envoyerJson(response, json);
+            return;
+        }
 
         request.setAttribute("historique", getHistorique(request.getSession()));
         request.setAttribute("erreur", request.getParameter("err"));
@@ -51,18 +67,28 @@ public class AssistantServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
         String url = request.getContextPath() + "/client/assistant";
+        boolean json = "json".equals(request.getParameter("format"));
+        JsonObject resultat = new JsonObject();
 
-        // bouton "Nouvelle conversation"
         if ("effacer".equals(request.getParameter("action"))) {
             session.removeAttribute(HISTORIQUE);
-            response.sendRedirect(url);
+            if (json) {
+                envoyerJson(response, resultat);
+            } else {
+                response.sendRedirect(url);
+            }
             return;
         }
 
         Validateur v = new Validateur();
         String question = v.texte(request.getParameter("question"), "La question", 2, 500, true);
         if (!v.estValide()) {
-            response.sendRedirect(url + "?err=" + FormUtil.enc(v.messages()));
+            if (json) {
+                resultat.addProperty("erreur", v.messages());
+                envoyerJson(response, resultat);
+            } else {
+                response.sendRedirect(url + "?err=" + FormUtil.enc(v.messages()));
+            }
             return;
         }
 
@@ -70,22 +96,38 @@ public class AssistantServlet extends HttpServlet {
         List<String[]> historique = getHistorique(session);
         historique.add(new String[] { "user", question });
 
+        String reponse;
         try {
-            String reponse = assistant.repondre(consignes(client), historique);
+            reponse = assistant.repondre(consignes(client), historique);
             historique.add(new String[] { "model", reponse });
         } catch (BusinessException e) {
             // la question n'a pas eu de réponse : on la retire de l'historique
             historique.remove(historique.size() - 1);
-            response.sendRedirect(url + "?err=" + FormUtil.enc(e.getMessage()));
+            if (json) {
+                resultat.addProperty("erreur", e.getMessage());
+                envoyerJson(response, resultat);
+            } else {
+                response.sendRedirect(url + "?err=" + FormUtil.enc(e.getMessage()));
+            }
             return;
         }
 
-        // on supprime les plus vieux messages si la conversation devient trop longue
         while (historique.size() > MAX_MESSAGES) {
             historique.remove(0);
         }
 
-        response.sendRedirect(url);
+        if (json) {
+            resultat.addProperty("reponse", reponse);
+            envoyerJson(response, resultat);
+        } else {
+            response.sendRedirect(url);
+        }
+    }
+
+    private void envoyerJson(HttpServletResponse response, JsonObject json) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json.toString());
     }
 
     @SuppressWarnings("unchecked")
@@ -101,8 +143,8 @@ public class AssistantServlet extends HttpServlet {
     // texte envoyé à l'IA pour lui expliquer son rôle et lui donner les infos du client
     private String consignes(Utilisateur client) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Tu es l'assistant virtuel d'une compagnie d'assurance. ");
-        sb.append("Tu réponds en français, avec des phrases courtes et simples. ");
+        sb.append("Tu es Bibi, l'assistant virtuel de B'Care, une compagnie d'assurance. ");
+        sb.append("Tu réponds en français, avec des phrases courtes et simples, sans mise en forme (pas de gras ni de listes avec des étoiles). ");
         sb.append("Tu aides le client à comprendre ses contrats, ses garanties, ses sinistres et ses paiements, ");
         sb.append("et tu peux lui expliquer comment déclarer un sinistre depuis son espace. ");
         sb.append("N'invente aucune information : si tu ne sais pas, conseille-lui de contacter un agent. ");

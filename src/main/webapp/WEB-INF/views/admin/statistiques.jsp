@@ -4,52 +4,22 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Statistiques — Administration</title>
+    <title>Statistiques — Administration · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <style>
-        :root { --p:#5e35b1; --s:#00897b; --w:#f57c00; --d:#c62828; --bg:#f4f6f9; }
-        body { font-family: Segoe UI, Arial, sans-serif; background: var(--bg); margin:0; color:#222; }
-        header { background: var(--p); color:#fff; padding:16px 24px; }
-        header h1 { margin:0; font-size:1.4rem; }
-        nav a { color:#fff; margin-right:14px; text-decoration:none; }
-        main { padding:24px; max-width:1300px; margin:auto; }
-        .kpis { display:grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap:16px; }
-        .kpi { background:#fff; border-radius:10px; padding:18px; box-shadow:0 2px 6px rgba(0,0,0,.08); }
-        .kpi .label { color:#666; font-size:.85rem; }
-        .kpi .value { font-size:1.8rem; font-weight:700; margin-top:6px; color:var(--p); }
-        .kpi.s .value { color:var(--s); } .kpi.w .value { color:var(--w); } .kpi.d .value { color:var(--d); }
-        .charts { display:grid; grid-template-columns: repeat(auto-fit,minmax(420px,1fr)); gap:24px; margin-top:28px; }
-        .chart-card { background:#fff; border-radius:10px; padding:18px; box-shadow:0 2px 6px rgba(0,0,0,.08); }
-        .chart-card h3 { margin:0 0 12px; font-size:1.05rem; }
-        table { width:100%; border-collapse:collapse; margin-top:8px; }
-        th,td { padding:8px; text-align:left; border-bottom:1px solid #eee; font-size:.9rem; }
-        th { background:#fafafa; }
-        section { margin-bottom: 28px; }
-        .btn-retour {display:inline-block;padding:8px 14px;background:#2c6fbb;color:#fff;text-decoration:none;border-radius:4px;}
-        .btn-retour:hover{background:#1f5596;}
-    </style>
 </head>
 <body>
-<header>
-    <h1>📊 Tableau de bord — Administrateur</h1>
-    <nav>
-        <a href="${pageContext.request.contextPath}/admin/utilisateurs">Utilisateurs</a>
-        <a href="${pageContext.request.contextPath}/admin/types">Types d'assurance</a>
-        <a href="${pageContext.request.contextPath}/agent/contrats">Contrats</a>
-        <a href="${pageContext.request.contextPath}/agent/sinistres">Sinistres</a>
-        <a href="${pageContext.request.contextPath}/admin/statistiques">Statistiques</a>
-    </nav>
-</header>
-<main>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
+    <h1>Tableau de bord — Administrateur</h1>
 
     <section class="chart-card">
-        <h2 style="margin-top:0">Analyse par l'IA</h2>
+        <h2>Analyse par l'IA</h2>
         <c:if test="${not empty erreurIA}">
-            <p style="color:var(--d)"><c:out value="${erreurIA}"/></p>
+            <p class="alerte ko"><c:out value="${erreurIA}"/></p>
         </c:if>
         <c:if test="${not empty analyseIA}">
-            <p style="white-space:pre-wrap"><c:out value="${analyseIA}"/></p>
+            <p class="texte-ia"><c:out value="${analyseIA}"/></p>
         </c:if>
         <form method="post" action="${pageContext.request.contextPath}/admin/statistiques">
             <button type="submit">Analyser les chiffres avec l'IA</button>
@@ -58,14 +28,14 @@
 
     <!-- Vue d'ensemble utilisateurs -->
     <section>
-        <h2 style="margin-top:0">Utilisateurs &amp; Clients</h2>
+        <h2>Utilisateurs &amp; Clients</h2>
         <div class="kpis">
             <div class="kpi"><div class="label">Total clients</div><div class="value">${totalClients}</div></div>
             <div class="kpi s"><div class="label">Nouveaux (30 j)</div><div class="value">${newClients30j}</div></div>
             <div class="kpi"><div class="label">Agents</div><div class="value">${nbAgents}</div></div>
             <div class="kpi w"><div class="label">Administrateurs</div><div class="value">${nbAdmins}</div></div>
         </div>
-        <div class="chart-card" style="margin-top:16px">
+        <div class="chart-card">
             <h3>Répartition clients par type d'assurance</h3>
             <canvas id="chartClientsType"></canvas>
         </div>
@@ -83,7 +53,7 @@
             <div class="kpi"><div class="label">Prime moyenne</div>
                 <div class="value"><fmt:formatNumber value="${primeMoyenne}" pattern="#,##0.00"/> €</div></div>
         </div>
-        <div class="chart-card" style="margin-top:16px">
+        <div class="chart-card">
             <h3>Évolution du nombre de contrats (12 mois)</h3>
             <canvas id="chartEvolContrats"></canvas>
         </div>
@@ -101,7 +71,7 @@
                 <div class="value"><fmt:formatNumber value="${tauxSinistralite}" pattern="#,##0.00"/> %</div></div>
             <div class="kpi"><div class="label">Paiements en attente</div><div class="value">${nbPaiementsEnAttente}</div></div>
         </div>
-        <div class="chart-card" style="margin-top:16px">
+        <div class="chart-card">
             <h3>Évolution mensuelle Paiements / Indemnisations (12 mois)</h3>
             <canvas id="chartEvolFin"></canvas>
         </div>
@@ -181,6 +151,7 @@
         }
     });
 </script>
-<a href="${pageContext.request.contextPath}/admin/accueil" class="btn-retour">← Retour à l'accueil</a>
+
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
 </body>
 </html>

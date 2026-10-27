@@ -2,8 +2,14 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><title>Contrat <c:out value="${contrat.numeroContrat}"/></title></head>
+<html lang="fr">
+<head>
+    <title>Contrat <c:out value="${contrat.numeroContrat}"/> · B'Care</title>
+    <%@ include file="/WEB-INF/views/fragments/head.jspf" %>
+</head>
 <body>
+<%@ include file="/WEB-INF/views/fragments/nav.jspf" %>
+<main class="page">
 <p><a href="${ctx}/client/contrats">← Mes contrats</a></p>
 <h1>Contrat <c:out value="${contrat.numeroContrat}"/> — <em>${contrat.statut}</em></h1>
 
@@ -23,4 +29,7 @@
 <c:if test="${contrat.statut == 'ACTIF'}">
   <p><a href="${ctx}/client/sinistres/declarer?contratId=${contrat.id}">Déclarer un sinistre sur ce contrat</a></p>
 </c:if>
-</body></html>
+</main>
+<%@ include file="/WEB-INF/views/fragments/pied.jspf" %>
+</body>
+</html>
