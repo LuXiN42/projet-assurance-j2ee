@@ -20,7 +20,7 @@ public class PaiementService {
         this.contratDao = contratDao;
     }
 
-    // ===================== LECTURE =====================
+    // ---------- lecture ----------
 
     public List<Paiement> tous()                         { return paiementDao.findAllComplet(); }
     public List<Paiement> parStatut(StatutPaiement s)    { return paiementDao.findByStatut(s); }
@@ -36,13 +36,11 @@ public class PaiementService {
         return p;
     }
 
-    // ===================== ENREGISTREMENT (agent) =====================
+    // ---------- enregistrement ----------
 
     /**
-     * Enregistre un paiement. 
-     * - date nulle => aujourd'hui
-     * - statut nul => EFFECTUE
-     * Un paiement EN_ATTENTE sert à planifier une échéance (date future autorisée).
+     * Enregistre un paiement. Sans date on prend aujourd'hui, sans statut on met EFFECTUE.
+     * Un paiement EN_ATTENTE sert pour une échéance future.
      */
     public Paiement enregistrer(Long contratId, BigDecimal montant, LocalDate date,
                                 ModePaiement mode, StatutPaiement statut) {
@@ -75,7 +73,7 @@ public class PaiementService {
         return p;
     }
 
-    // ===================== CHANGEMENT DE STATUT (agent) =====================
+    // ---------- changement de statut ----------
 
     /** Valide un paiement en attente. */
     public Paiement valider(Long paiementId, ModePaiement mode) {
@@ -107,7 +105,7 @@ public class PaiementService {
         return detail(paiementId);
     }
 
-    // ===================== RÈGLE : activation du contrat =====================
+    // ---------- activation du contrat ----------
 
     private void activerSiPremierPaiement(Contrat c) {
         if (c.getStatut() == StatutContrat.EN_ATTENTE) {

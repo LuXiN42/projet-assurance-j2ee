@@ -23,13 +23,13 @@ public abstract class GenericDao<T, ID> {
         this.type = type;
     }
 
-    // ===================== CREATE =====================
+    // ---------- ajout ----------
 
     public void save(T entity) {
         inTransaction(session -> session.persist(entity));
     }
 
-    // ===================== READ =====================
+    // ---------- lecture ----------
 
     public T findById(ID id) {
         return inSession(session -> session.get(type, id));
@@ -45,13 +45,13 @@ public abstract class GenericDao<T, ID> {
                 session.createQuery("select count(e) from " + type.getSimpleName() + " e", Long.class).uniqueResult());
     }
 
-    // ===================== UPDATE =====================
+    // ---------- modification ----------
 
     public T update(T entity) {
         return inTransactionWithResult(session -> session.merge(entity));
     }
 
-    // ===================== DELETE =====================
+    // ---------- suppression ----------
 
     public void delete(T entity) {
         inTransaction(session ->
@@ -67,7 +67,7 @@ public abstract class GenericDao<T, ID> {
         });
     }
 
-    // ===================== OUTILS (réutilisables par les DAO enfants) =====================
+    // ---------- outils pour les dao ----------
 
     /** Lecture simple, sans transaction. */
     protected <R> R inSession(Function<Session, R> action) {

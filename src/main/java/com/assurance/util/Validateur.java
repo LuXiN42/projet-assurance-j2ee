@@ -21,7 +21,7 @@ public class Validateur {
     public boolean estValide()       { return erreurs.isEmpty(); }
     public void ajouter(String msg)  { erreurs.add(msg); }
 
-    /* ---------- Chaînes ---------- */
+    /* ---------- chaînes ---------- */
 
     public String obligatoire(String valeur, String champ) {
         if (FormUtil.isBlank(valeur)) { erreurs.add(champ + " est obligatoire."); return null; }
@@ -72,7 +72,7 @@ public class Validateur {
         return motDePasse(mdp, confirmation);
     }
 
-    /* ---------- Nombres ---------- */
+    /* ---------- nombres ---------- */
 
     public Long id(String valeur, String champ) {
         if (FormUtil.isBlank(valeur)) { erreurs.add(champ + " est obligatoire."); return null; }
@@ -96,7 +96,7 @@ public class Validateur {
         return v;
     }
 
-    /* ---------- Dates ---------- */
+    /* ---------- dates ---------- */
 
     public LocalDate date(String valeur, String champ, boolean requis) {
         if (FormUtil.isBlank(valeur)) {
@@ -118,7 +118,7 @@ public class Validateur {
             erreurs.add("La date de fin doit être postérieure à la date de début.");
     }
 
-    /* ---------- Enums ---------- */
+    /* ---------- enums ---------- */
 
     public <E extends Enum<E>> E choix(Class<E> type, String valeur, String champ) {
         if (FormUtil.isBlank(valeur)) { erreurs.add(champ + " est obligatoire."); return null; }

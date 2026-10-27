@@ -55,7 +55,7 @@ public class ContratFormServlet extends HttpServlet {
             // id caché : null = création (ce n'est pas une erreur)
             Long id = FormUtil.parseLong(req.getParameter("id"));
 
-            // ---- Validation côté servlet (exigence section 4 du sujet) ----
+            // ---------- validation ----------
             Validateur v = new Validateur();
             LocalDate dateDeb = v.date(req.getParameter("dateDebut"), "La date de début", true);
             LocalDate dateFin = v.date(req.getParameter("dateFin"), "La date de fin", false);

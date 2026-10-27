@@ -23,7 +23,7 @@ public class SinistreDao extends GenericDao<Sinistre, Long> {
         super(Sinistre.class);
     }
 
-    // ===================== LECTURE =====================
+    // ---------- lecture ----------
 
     public Sinistre findByIdComplet(Long id) {
         return inSession(session ->
@@ -103,7 +103,7 @@ public class SinistreDao extends GenericDao<Sinistre, Long> {
             .uniqueResult());
     }
 
-    // ===================== TRAITEMENT PAR L'AGENT =====================
+    // ---------- traitement par l'agent ----------
 
     public void changerStatut(Long sinistreId, StatutSinistre statut) {
         inTransaction(session -> {
@@ -174,7 +174,7 @@ public class SinistreDao extends GenericDao<Sinistre, Long> {
         return String.format("SIN-%d-%05d", LocalDate.now().getYear(), count() + 1);
     }
 
-    // ===================== STATISTIQUES =====================
+    // ---------- stats ----------
 
     public long countByStatut(StatutSinistre statut) {
         return inSession(session ->

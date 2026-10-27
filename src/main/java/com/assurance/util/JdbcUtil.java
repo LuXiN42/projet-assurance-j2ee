@@ -7,41 +7,21 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Utilitaire JDBC pur (DriverManager).
- *
- * <p>Le driver MySQL {@code com.mysql.cj.jdbc.Driver} est chargé explicitement
- * via {@link Class#forName(String)} au chargement de la classe.</p>
- *
- * <p>Les paramètres de connexion sont lus depuis le classpath
- * (ordre de priorité) :</p>
- * <ol>
- *   <li>{@code db.properties}, clés : {@code db.url}, {@code db.user}, {@code db.password}</li>
- *   <li>En repli : {@code hibernate.cfg.xml} (propriétés
- *       {@code hibernate.connection.url|username|password})</li>
- *   <li>En dernier repli : valeurs par défaut alignées sur la config Hibernate.</li>
- * </ol>
- *
- * <p>Usage :</p>
- * <pre>{@code
- * try (Connection cn = JdbcUtil.getConnection()) {
- *     // ... requêtes JDBC ...
- * }
- * }</pre>
+ * Connexion JDBC pour les statistiques.
+ * Les identifiants sont lus dans db.properties, sinon dans hibernate.cfg.xml,
+ * sinon on prend les valeurs par défaut ci-dessous.
  */
 public final class JdbcUtil {
 
-    /** Driver JDBC MySQL 8.x (aligné sur hibernate.cfg.xml). */
+    // valeurs par défaut, les mêmes que dans hibernate.cfg.xml
     private static final String DEFAULT_DRIVER = "com.mysql.cj.jdbc.Driver";
 
-    /** URL JDBC par défaut, alignée sur hibernate.cfg.xml. */
     private static final String DEFAULT_URL =
             "jdbc:mysql://localhost:3306/assurance_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
-    /** Utilisateur par défaut, aligné sur hibernate.cfg.xml. */
     private static final String DEFAULT_USER = "assurance";
 
-    /** Mot de passe par défaut, aligné sur hibernate.cfg.xml. */
-    private static final String DEFAULT_PASSWORD = "assuranceGroupeO";
+    private static final String DEFAULT_PASSWORD = "Assurance2026!";
 
     private static String url;
     private static String user;
@@ -49,9 +29,9 @@ public final class JdbcUtil {
 
     static {
         try {
-            // 1) Tentative : db.properties
+            // d'abord db.properties
             loadFromDbProperties();
-            // 2) Compléter avec hibernate.cfg.xml si des clés manquent
+            // sinon hibernate.cfg.xml
             if (url == null || url.isEmpty()) {
                 loadFromHibernateCfg();
             }
@@ -91,7 +71,7 @@ public final class JdbcUtil {
             user     = p.getProperty("db.user",     DEFAULT_USER);
             password = p.getProperty("db.password", DEFAULT_PASSWORD);
         } catch (Exception ignored) {
-            // silencieux : on conserve les défauts
+            // on garde les valeurs par défaut
         }
     }
 
@@ -112,7 +92,7 @@ public final class JdbcUtil {
             if (usr != null)               user = usr;
             if (pwd != null)               password = pwd;
         } catch (Exception ignored) {
-            // silencieux
+            // on garde les valeurs par défaut
         }
     }
 
@@ -140,12 +120,7 @@ public final class JdbcUtil {
         return null;
     }
 
-    /**
-     * Ouvre (et fait vivre le temps de la requête) une connexion JDBC.
-     *
-     * @return connexion JDBC ouverte via {@link DriverManager}.
-     * @throws SQLException si la connexion échoue.
-     */
+    /** Ouvre une connexion, à fermer avec un try-with-resources. */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, user, password);
     }

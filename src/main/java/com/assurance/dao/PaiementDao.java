@@ -22,7 +22,7 @@ public class PaiementDao extends GenericDao<Paiement, Long> {
         super(Paiement.class);
     }
 
-    // ===================== LECTURE =====================
+    // ---------- lecture ----------
 
     public List<Paiement> findAllComplet() {
         return inSession(session ->
@@ -65,7 +65,7 @@ public class PaiementDao extends GenericDao<Paiement, Long> {
                         .list());
     }
 
-    // ===================== ÉCRITURE =====================
+    // ---------- écriture ----------
 
     /** L'agent valide un paiement en attente. */
     public void marquerEffectue(Long paiementId) {
@@ -94,7 +94,7 @@ public class PaiementDao extends GenericDao<Paiement, Long> {
                         .setParameter("id", id).uniqueResult());
     }
 
-    // ===================== STATISTIQUES =====================
+    // ---------- stats ----------
 
     /** Chiffre d'affaires = somme des paiements effectués. */
     public BigDecimal chiffreAffaires() {

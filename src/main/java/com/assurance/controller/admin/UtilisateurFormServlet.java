@@ -52,7 +52,7 @@ public class UtilisateurFormServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         Utilisateur admin = (Utilisateur) request.getSession().getAttribute(SessionKeys.UTILISATEUR);
 
-        // ---- Validation commune ----
+        // ---------- validation ----------
         Validateur v = new Validateur();
         Long id       = FormUtil.parseLong(request.getParameter("id"));
         String nom    = v.texte(request.getParameter("nom"),    "Le nom",    2, 100, true);

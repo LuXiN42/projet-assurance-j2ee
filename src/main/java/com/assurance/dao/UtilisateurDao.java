@@ -15,7 +15,7 @@ public class UtilisateurDao extends GenericDao<Utilisateur, Long> {
         super(Utilisateur.class);
     }
 
-    // ===================== AUTHENTIFICATION =====================
+    // ---------- connexion ----------
 
     /** Retrouve un utilisateur par son email (utilisé au login). Renvoie null si inexistant. */
     public Utilisateur findByEmail(String email) {
@@ -30,7 +30,7 @@ public class UtilisateurDao extends GenericDao<Utilisateur, Long> {
         return nb != null && nb > 0;
     }
 
-    // ===================== GESTION PAR RÔLE =====================
+    // ---------- par rôle ----------
 
     /** Liste les utilisateurs d'un rôle donné */
     public List<Utilisateur> findByRole(Role role) {
@@ -55,7 +55,7 @@ public class UtilisateurDao extends GenericDao<Utilisateur, Long> {
         });
     }
 
-    // ===================== RECHERCHE =====================
+    // ---------- recherche ----------
 
         /** Recherche par nom, prénom ou email. */
     public List<Utilisateur> search(String motCle) {

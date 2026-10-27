@@ -12,7 +12,7 @@
 <main class="page">
 <h2>Déclarer un sinistre</h2>
 
-<%-- 1. La servlet envoie "erreur" (une chaîne), échappée contre le XSS --%>
+<%-- message d'erreur de la servlet, affiché avec c:out pour éviter le XSS --%>
 <c:if test="${not empty erreur}">
     <p class="alerte ko"><c:out value="${erreur}"/></p>
 </c:if>

@@ -21,13 +21,13 @@ public class AuthFilter implements Filter {
         HttpSession session = req.getSession(false);
         Utilisateur u = session == null ? null : (Utilisateur) session.getAttribute(SessionKeys.UTILISATEUR);
 
-        // 1. Pas connecté → page de login
+        // pas connecté : retour au login
         if (u == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
-        // 2. Connecté mais mauvais rôle → 403
+        // connecté mais pas le bon rôle : 403
         String chemin = req.getRequestURI().substring(req.getContextPath().length());
         if (!autorise(chemin, u.getRole())) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès refusé");

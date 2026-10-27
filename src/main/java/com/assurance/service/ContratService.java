@@ -8,15 +8,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Service métier des contrats.
- *
- * Transitions autorisées :
- *   EN_ATTENTE --activer-->   ACTIF
- *   ACTIF      --suspendre--> SUSPENDU
- *   SUSPENDU   --activer-->   ACTIF
- *   ACTIF | SUSPENDU --resilier--> RESILIE          (terminal)
- *   ACTIF | EXPIRE   --renouveler--> ACTIF (dateFin prolongée)
- *   ACTIF      --(dateFin dépassée)--> EXPIRE       (batch mettreAJourContratsExpires)
+ * Service des contrats.
+ * activer : EN_ATTENTE ou SUSPENDU vers ACTIF
+ * suspendre : ACTIF vers SUSPENDU
+ * résilier : ACTIF ou SUSPENDU vers RESILIE (définitif)
+ * renouveler : ACTIF ou EXPIRE vers ACTIF, la date de fin est repoussée
+ * un contrat actif dont la date de fin est passée devient EXPIRE
  */
 public class ContratService {
 
@@ -25,7 +22,7 @@ public class ContratService {
     public ContratService() { this(new ContratDao()); }
     public ContratService(ContratDao contratDao) { this.contratDao = contratDao; }
 
-    // ===================== LECTURE =====================
+    // ---------- lecture ----------
 
     public List<Contrat> rechercher(String numero, String nomClient, Long typeId, StatutContrat statut) {
         return contratDao.rechercher(numero, nomClient, typeId, statut);
@@ -69,7 +66,7 @@ public class ContratService {
         return c;
     }
 
-    // ===================== CRÉATION / MODIFICATION =====================
+    // ---------- création et modification ----------
 
     public Contrat souscrire(Contrat c) {
         if (c == null) throw new BusinessException("Contrat nul.");
@@ -114,7 +111,7 @@ public class ContratService {
         if (c.getTypeAssurance() == null) throw new BusinessException("Le type d'assurance est obligatoire.");
     }
 
-    // ===================== TRANSITIONS =====================
+    // ---------- transitions ----------
 
     public Contrat activer(Long contratId) {
         Contrat c = mustExist(contratId);
@@ -154,7 +151,7 @@ public class ContratService {
 
     public int mettreAJourContratsExpires() { return contratDao.mettreAJourContratsExpires(); }
 
-    // ===================== UTILITAIRES =====================
+    // ---------- utilitaires ----------
 
     private Contrat mustExist(Long id) {
         Contrat c = id == null ? null : contratDao.findByIdComplet(id);

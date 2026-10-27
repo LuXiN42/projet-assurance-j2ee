@@ -53,7 +53,7 @@ public class SinistreService {
         this.contratDao = contratDao;
     }
 
-    // ===================== DECLARATION =====================
+    // ---------- déclaration ----------
 
     /**
      * Déclare un sinistre pour un client sur un contrat donné.
@@ -124,7 +124,7 @@ public class SinistreService {
         return s;
     }
 
-    // ===================== TRAITEMENT =====================
+    // ---------- traitement ----------
 
     /**
      * Change le statut d'un sinistre en respectant la matrice des transitions autorisées.
@@ -172,7 +172,7 @@ public class SinistreService {
         return s;
     }
 
-    // ===================== TRANSITIONS =====================
+    // ---------- transitions ----------
 
     private void verifierTransition(StatutSinistre courant, StatutSinistre cible) {
         if (courant == cible) {
@@ -186,14 +186,14 @@ public class SinistreService {
         }
     }
 
-    /** Construit la map des transitions pour exposer aux JSP / tests. */
+    /** Copie des transitions possibles pour chaque statut. */
     public static Map<StatutSinistre, Set<StatutSinistre>> transitionsAutorisees() {
         Map<StatutSinistre, Set<StatutSinistre>> copie = new EnumMap<>(StatutSinistre.class);
         TRANSITIONS.forEach((k, v) -> copie.put(k, EnumSet.copyOf(v)));
         return copie;
     }
 
-    // ===================== UTILITAIRES =====================
+    // ---------- utilitaires ----------
 
     /** Récupération rapide du client d'un sinistre. */
     public Utilisateur clientDuSinistre(Sinistre s) {

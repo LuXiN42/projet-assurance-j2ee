@@ -15,9 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 
-/**
- * Tableau de bord statistiques (T28), version AGENT.
- */
+/** Page statistiques de l'agent. */
 @WebServlet("/agent/statistiques")
 public class StatistiquesAgentServlet extends HttpServlet {
 
@@ -30,13 +28,13 @@ public class StatistiquesAgentServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
-        // -------- KPI : Clients --------
+        // ---------- clients ----------
         long totalClients   = dao.countClients();
         long newClients30j  = dao.countNewClients(30);
-        long newClientsMois = dao.countNewClients(30); // approximation pédagogique
+        long newClientsMois = dao.countNewClients(30); // sur les 30 derniers jours
         List<Map<String, Object>> clientsParType = dao.clientsParTypeAssurance();
 
-        // -------- KPI : Contrats --------
+        // ---------- contrats ----------
         long cActifs   = dao.countContratsParStatut("ACTIF");
         long cAttente  = dao.countContratsParStatut("EN_ATTENTE");
         long cSuspendu = dao.countContratsParStatut("SUSPENDU");
@@ -44,7 +42,7 @@ public class StatistiquesAgentServlet extends HttpServlet {
         long cResilies = dao.countContratsParStatut("RESILIE");
         Map<String, Long> evolCtr = dao.evolutionContrats12();
 
-        // -------- KPI : Finances --------
+        // ---------- finances ----------
         BigDecimal ca       = dao.caEncaisse();
         BigDecimal indem    = dao.totalIndemnisations();
         BigDecimal primes   = dao.primesContratsActifs();
@@ -52,12 +50,12 @@ public class StatistiquesAgentServlet extends HttpServlet {
         long nbPaiements    = countPaiementsEncaisses();
         Map<String, BigDecimal> evolIndem = evolutionIndemnisations12();
 
-        // -------- KPI dérivés --------
-        BigDecimal primeMoyenne = primes; // placeholder (pas utilisé en vue agent)
+        // ---------- autres chiffres ----------
+        BigDecimal primeMoyenne = primes; // pas affiché côté agent
         BigDecimal tauxSin       = dao.tauxSinistralite();
         BigDecimal panierMoy     = dao.panierMoyen();
 
-        // -------- Attributs numériques consommés par la JSP --------
+        // ---------- envoi à la jsp ----------
         req.setAttribute("totalClients",    totalClients);
         req.setAttribute("newClients30j",   newClients30j);
         req.setAttribute("newClientsMois",  newClientsMois);
@@ -80,16 +78,16 @@ public class StatistiquesAgentServlet extends HttpServlet {
         req.setAttribute("tauxSinistralite", tauxSin);
         req.setAttribute("panierMoyen",    panierMoy);
 
-        // -------- Attributs JSON (Chart.js) --------
-        // Répartition clients par type d'assurance (chart "pie")
+        // ---------- données des graphiques ----------
+        // camembert : clients par type
         req.setAttribute("clientsParTypeLabelsJson", toJsonArrayRows(clientsParType, "type"));
         req.setAttribute("clientsParTypeDataJson",   toJsonArrayRowsLong(clientsParType, "nb_clients"));
 
-        // Évolution mensuelle du nombre de contrats (chart "line")
+        // courbe : contrats par mois
         req.setAttribute("evolContratsLabelsJson", toJsonArrayKeys(evolCtr));
         req.setAttribute("evolContratsDataJson",   toJsonArrayValuesLong(evolCtr));
 
-        // Évolution mensuelle Paiements vs Indemnisations (chart "bar")
+        // barres : paiements et indemnisations par mois
         req.setAttribute("evolFinLabelsJson",       toJsonArrayKeys(evolPaie));
         req.setAttribute("evolFinPaiementsJson",    toJsonArrayValuesBigDecimal(evolPaie));
         req.setAttribute("evolFinIndemJson",        toJsonArrayValuesBigDecimal(evolIndem));
@@ -97,9 +95,7 @@ public class StatistiquesAgentServlet extends HttpServlet {
         req.getRequestDispatcher(VUE).forward(req, resp);
     }
 
-    // ========================================================================
-    //                         Calculs JDBC complémentaires
-    // ========================================================================
+    // ---------- requêtes en plus ----------
 
     /** Compte les paiements dont le statut = 'EFFECTUE'. */
     private long countPaiementsEncaisses() {
@@ -140,14 +136,12 @@ public class StatistiquesAgentServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            // silencieux : graphique affiche 0 sur tous les mois
+            // en cas d'erreur le graphique reste à 0
         }
         return out;
     }
 
-    // ========================================================================
-    //                        Sérialiseurs JSON minimalistes
-    // ========================================================================
+    // ---------- conversion en json ----------
 
     private static String toJsonArrayKeys(Map<String, ?> m) {
         return toJsonArray(m.keySet());

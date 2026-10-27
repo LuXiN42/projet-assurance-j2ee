@@ -102,7 +102,7 @@ mysql -u assurance -p assurance_db
 À l'invite `mysql>`, exécuter :
 
 ```sql
-SELECT COUNT(*) FROM utilisateur;
+SELECT COUNT(*) FROM utilisateurs;
 EXIT;
 ```
 
@@ -113,7 +113,7 @@ Le résultat attendu est **30**.
 Vérifier que les paramètres de connexion à MySQL utilisent la base `assurance_db`, l'utilisateur `assurance` et le mot de passe `Assurance2026!` dans les deux fichiers suivants :
 
 - `src/main/resources/hibernate.cfg.xml`
-- `db.properties`
+- `src/main/resources/db.properties`
 
 Si vous changez d'utilisateur MySQL ou de mot de passe, mettez à jour les paramètres correspondants dans ces deux fichiers.
 

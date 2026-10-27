@@ -33,7 +33,7 @@ public class PaiementFormServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
-        // ---- Validation côté servlet (exigence section 4 du sujet) ----
+        // ---------- validation ----------
         Validateur v = new Validateur();
         Long contratId      = v.id(req.getParameter("contratId"), "Le contrat");
         BigDecimal montant  = v.montant(req.getParameter("montant"), "Le montant", true, true);

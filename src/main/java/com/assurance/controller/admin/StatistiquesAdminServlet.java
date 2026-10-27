@@ -25,9 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * Tableau de bord statistiques (T28), version ADMIN.
- */
+/** Page statistiques de l'admin. */
 @WebServlet("/admin/statistiques")
 public class StatistiquesAdminServlet extends HttpServlet {
 
@@ -48,12 +46,12 @@ public class StatistiquesAdminServlet extends HttpServlet {
         session.removeAttribute("analyseIA");
         session.removeAttribute("erreurIA");
 
-        // -------- KPI : Clients --------
+        // ---------- clients ----------
         long totalClients   = dao.countClients();
         long newClients30j  = dao.countNewClients(30);
         List<Map<String, Object>> clientsParType = dao.clientsParTypeAssurance();
 
-        // -------- KPI : Contrats --------
+        // ---------- contrats ----------
         long cActifs   = dao.countContratsParStatut("ACTIF");
         long cAttente  = dao.countContratsParStatut("EN_ATTENTE");
         long cSuspendu = dao.countContratsParStatut("SUSPENDU");
@@ -62,7 +60,7 @@ public class StatistiquesAdminServlet extends HttpServlet {
         Map<String, Long> evolCtr = dao.evolutionContrats12();
         BigDecimal primeMoyenne = primeMoyenneContrats();
 
-        // -------- KPI : Finances --------
+        // ---------- finances ----------
         BigDecimal ca     = dao.caEncaisse();
         BigDecimal indem  = dao.totalIndemnisations();
         BigDecimal primes = dao.primesContratsActifs();
@@ -70,18 +68,18 @@ public class StatistiquesAdminServlet extends HttpServlet {
         Map<String, BigDecimal> evolIndem = evolutionIndemnisations12();
         long nbPaiementsEnAttente = countPaiementsByStatut("EN_ATTENTE");
 
-        // -------- KPI : Sinistres --------
+        // ---------- sinistres ----------
         List<Map<String, Object>> repSinBrut = dao.repartitionSinistres();
         List<Map<String, Object>> sinistresParStatut = normalizeSinistres(repSinBrut);
         List<Map<String, Object>> topContratsSinistres = topContratsSinistres();
 
-        // -------- KPI : Admin / RH --------
+        // ---------- admin ----------
         long nbAgents        = dao.countAgents();
         long nbAdmins        = dao.countAdmins();
         BigDecimal tauxSin   = dao.tauxSinistralite();
         BigDecimal panierMoy = dao.panierMoyen();
 
-        // -------- Attributs numériques consommés par la JSP --------
+        // ---------- envoi à la jsp ----------
         req.setAttribute("totalClients",    totalClients);
         req.setAttribute("newClients30j",   newClients30j);
         req.setAttribute("clientsParType",  clientsParType);
@@ -108,7 +106,7 @@ public class StatistiquesAdminServlet extends HttpServlet {
         req.setAttribute("tauxSinistralite", tauxSin);
         req.setAttribute("panierMoyen",    panierMoy);
 
-        // -------- Attributs JSON (Chart.js) --------
+        // ---------- données des graphiques ----------
         req.setAttribute("clientsParTypeLabelsJson", toJsonArrayRows(clientsParType, "type"));
         req.setAttribute("clientsParTypeDataJson",   toJsonArrayRowsLong(clientsParType, "nb_clients"));
 
@@ -174,9 +172,7 @@ public class StatistiquesAdminServlet extends HttpServlet {
         return sb.toString();
     }
 
-    // ========================================================================
-    //                         Calculs JDBC complémentaires
-    // ========================================================================
+    // ---------- requêtes en plus ----------
 
     /** Prime moyenne sur tous les contrats. */
     private BigDecimal primeMoyenneContrats() {
@@ -274,9 +270,7 @@ public class StatistiquesAdminServlet extends HttpServlet {
         return out;
     }
 
-    // ========================================================================
-    //                        Sérialiseurs JSON minimalistes
-    // ========================================================================
+    // ---------- conversion en json ----------
 
     private static String toJsonArrayKeys(Map<String, ?> m) {
         return toJsonArray(m.keySet());

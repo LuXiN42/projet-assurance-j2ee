@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Servlet réservée à l'agent d'assurance pour traiter un sinistre :
- */
+/** Traitement d'un sinistre par l'agent. */
 @WebServlet("/agent/sinistre")
 public class TraiterSinistreServlet extends HttpServlet {
 
@@ -33,7 +31,7 @@ public class TraiterSinistreServlet extends HttpServlet {
     private final SinistreDao sinistreDao = new SinistreDao();
     private final SinistreService sinistreService = new SinistreService();
 
-    // ===================== GET =====================
+    // ---------- get ----------
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -59,7 +57,7 @@ public class TraiterSinistreServlet extends HttpServlet {
         req.getRequestDispatcher(VUE).forward(req, resp);
     }
 
-    // ===================== POST =====================
+    // ---------- post ----------
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -93,7 +91,7 @@ public class TraiterSinistreServlet extends HttpServlet {
         resp.sendRedirect(req.getContextPath() + "/agent/sinistre?id=" + sinistreId);   // PRG
     }
 
-    // ===================== ACTIONS =====================
+    // ---------- actions ----------
 
     private void ajouterCommentaire(HttpServletRequest req, Utilisateur agent, Long sinistreId) {
         Validateur v = new Validateur();
@@ -127,7 +125,7 @@ public class TraiterSinistreServlet extends HttpServlet {
         req.getSession().setAttribute("message", "Sinistre indemnisé (" + montant + " €).");
     }
 
-    // ===================== UTILITAIRES =====================
+    // ---------- utilitaires ----------
 
     /** Récupère l'agent connecté, ou redirige vers /login et renvoie null. */
     private Utilisateur agentConnecte(HttpServletRequest req, HttpServletResponse resp)

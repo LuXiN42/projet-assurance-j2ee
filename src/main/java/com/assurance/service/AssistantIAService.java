@@ -102,8 +102,7 @@ public class AssistantIAService {
         }
     }
 
-    // lit la clé dans ia.properties (si le fichier n'existe pas, on regarde
-    // la variable d'environnement GEMINI_API_KEY, utile pour le correcteur)
+    // lit la clé dans ia.properties, sinon dans la variable d'environnement GEMINI_API_KEY
     private String lireCle() {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream("ia.properties")) {
             if (in != null) {

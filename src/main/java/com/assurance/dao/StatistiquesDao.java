@@ -20,9 +20,7 @@ import java.util.TreeMap;
  */
 public class StatistiquesDao {
 
-    // ========================================================================
-    //                            KPI CLIENTS
-    // ========================================================================
+    // ---------- clients ----------
 
     public long countClients() {
         return scalarLong(
@@ -78,9 +76,7 @@ public class StatistiquesDao {
                 " ORDER BY nb_clients DESC, ta.nom ASC");
     }
 
-    // ========================================================================
-    //                            KPI CONTRATS
-    // ========================================================================
+    // ---------- contrats ----------
 
     public long countContratsParStatut(String statut) {
         return scalarLong(
@@ -100,9 +96,7 @@ public class StatistiquesDao {
         return evolutionParMois("contrats", "date_debut");
     }
 
-    // ========================================================================
-    //                            KPI SINISTRES
-    // ========================================================================
+    // ---------- sinistres ----------
 
     public long countSinistresParStatut(String statut) {
         return scalarLong(
@@ -121,9 +115,7 @@ public class StatistiquesDao {
         return evolutionParMois("sinistres", "`date`");
     }
 
-    // ========================================================================
-    //                            KPI FINANCES
-    // ========================================================================
+    // ---------- finances ----------
 
     /** CA = somme des paiements statut = 'EFFECTUE' (primes effectivement encaissées). */
     public BigDecimal caEncaisse() {
@@ -153,9 +145,7 @@ public class StatistiquesDao {
                 "AND statut = 'EFFECTUE'");
     }
 
-    // ========================================================================
-    //                            KPI ADMIN
-    // ========================================================================
+    // ---------- admin ----------
 
     public long countAgents() {
         return scalarLong("SELECT COUNT(*) FROM utilisateurs WHERE role = 'AGENT'");
@@ -190,9 +180,7 @@ public class StatistiquesDao {
                 " ORDER BY nb_contrats DESC");
     }
 
-    // ========================================================================
-    //                       Helpers privés (try-with-resources)
-    // ========================================================================
+    // ---------- méthodes privées ----------
 
     private long scalarLong(String sql, Object... params) {
         try (Connection cn = JdbcUtil.getConnection();

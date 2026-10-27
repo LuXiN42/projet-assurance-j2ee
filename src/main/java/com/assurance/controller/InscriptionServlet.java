@@ -29,14 +29,14 @@ public class InscriptionServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
-        // ---- Validation commune (exigée par le sujet) ----
+        // ---------- validation ----------
         Validateur v = new Validateur();
         String nom    = v.texte(req.getParameter("nom"),    "Le nom",    2, 100, true);
         String prenom = v.texte(req.getParameter("prenom"), "Le prénom", 2, 100, true);
         String email  = v.email(req.getParameter("email"),  "L'email");
         String mdp    = v.motDePasse(req.getParameter("motDePasse"), req.getParameter("confirmation"));
 
-        // ---- Règle métier : email unique ----
+        // ---------- email unique ----------
         if (email != null && utilisateurDao.existsByEmail(email))
             v.ajouter("Cet email est déjà utilisé.");
 
@@ -46,7 +46,7 @@ public class InscriptionServlet extends HttpServlet {
             return;
         }
 
-        // ---- Création : toujours CLIENT (jamais de rôle venant du formulaire) ----
+        // ---------- création, toujours en client ----------
         Utilisateur u = new Utilisateur();
         u.setNom(nom);
         u.setPrenom(prenom);

@@ -23,7 +23,7 @@ public class ContratDao extends GenericDao<Contrat, Long> {
         super(Contrat.class);
     }
 
-    // ===================== LECTURE =====================
+    // ---------- lecture ----------
 
     public Contrat findByIdComplet(Long id) {
         return inSession(session ->
@@ -82,7 +82,7 @@ public class ContratDao extends GenericDao<Contrat, Long> {
         });
     }
 
-    // ===================== CHANGEMENTS DE STATUT =====================
+    // ---------- changements de statut ----------
 
     public void changerStatut(Long contratId, StatutContrat nouveauStatut) {
         inTransaction(session -> {
@@ -141,7 +141,7 @@ public class ContratDao extends GenericDao<Contrat, Long> {
         return String.format("CTR-%d-%05d", LocalDate.now().getYear(), count() + 1);
     }
 
-    // ===================== STATISTIQUES =====================
+    // ---------- stats ----------
 
     public long countByStatut(StatutContrat statut) {
         return inSession(session ->

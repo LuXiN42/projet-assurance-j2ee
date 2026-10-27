@@ -34,7 +34,7 @@ public class DeclarerSinistreServlet extends HttpServlet {
 
     private final ContratDao contratDao = new ContratDao();
     private final SinistreService sinistreService = new SinistreService(new SinistreDao(), contratDao);
-    // ===================== GET : afficher le formulaire =====================
+    // ---------- get : formulaire ----------
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -47,7 +47,7 @@ public class DeclarerSinistreServlet extends HttpServlet {
         req.getRequestDispatcher(VUE).forward(req, resp);
     }
 
-    // ===================== POST : enregistrer la déclaration =====================
+    // ---------- post : enregistrement ----------
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -62,7 +62,7 @@ public class DeclarerSinistreServlet extends HttpServlet {
                 return;
             }
 
-        // ---------- 1 + 2. Lecture et validation commune ----------
+        // ---------- lecture des champs ----------
         Validateur v = new Validateur();
         Long contratId           = v.id(req.getParameter("contratId"), "Le contrat");
         LocalDate date           = v.date(req.getParameter("date"), "La date du sinistre", true);
@@ -76,7 +76,7 @@ public class DeclarerSinistreServlet extends HttpServlet {
             return;
         }
 
-        // ---------- 2. Validation des fichiers (avant toute écriture) ----------
+        // ---------- vérif des fichiers ----------
         List<Part> fichiers = new ArrayList<>();
         for (Part p : req.getParts()) {
             if ("pieces".equals(p.getName()) && p.getSize() > 0) {
@@ -94,7 +94,7 @@ public class DeclarerSinistreServlet extends HttpServlet {
             }
         }
 
-        // ---------- 3. Écriture des fichiers sur disque (avant validation métier) ----------
+        // ---------- enregistrement des fichiers ----------
         Files.createDirectories(DOSSIER_UPLOADS);
         List<Path> ecrits = new ArrayList<>();
         List<PieceJustificative> pieces = new ArrayList<>();
@@ -114,7 +114,7 @@ public class DeclarerSinistreServlet extends HttpServlet {
             pieces.add(piece);
         }
 
-        // ---------- 4. Délégation au service métier ----------
+        // ---------- création du sinistre ----------
         Sinistre s;
         try {
             s = sinistreService.declarer(
@@ -126,7 +126,7 @@ public class DeclarerSinistreServlet extends HttpServlet {
                     montantEstime,
                     pieces);
         } catch (BusinessException e) {
-            // Si la validation métier échoue, on supprime les fichiers déjà écrits.
+            // le service a refusé : on supprime les fichiers déjà écrits
             for (Path f : ecrits) {
                 try { Files.deleteIfExists(f); } catch (IOException ignored) {}
             }
@@ -141,12 +141,12 @@ public class DeclarerSinistreServlet extends HttpServlet {
             return;
         }
 
-        // Pattern PRG (Post-Redirect-Get) : évite une double déclaration si l'utilisateur actualise la page
+        // redirection pour ne pas redéclarer si on actualise la page
         req.getSession().setAttribute("message", "Sinistre " + s.getNumeroSinistre() + " déclaré avec succès.");
         resp.sendRedirect(req.getContextPath() + "/client/accueil");
     }
 
-    // ===================== Méthodes utilitaires =====================
+    // ---------- utilitaires ----------
 
     /** Renvoie le client connecté, ou redirige vers /login et renvoie null. */
     private Utilisateur clientConnecte(HttpServletRequest req, HttpServletResponse resp) throws IOException {
