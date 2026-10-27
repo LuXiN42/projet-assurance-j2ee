@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,7 +8,7 @@
 </head>
 <body>
     <h1>Espace agent</h1>
-    <p>Bonjour ${sessionScope.utilisateur.prenom} !</p>
+    <p>Bonjour <c:out value="${sessionScope.utilisateur.prenom}"/> !</p>
 
     <ul>
         <li><a href="${ctx}/agent/clients">Consulter les clients</a></li>

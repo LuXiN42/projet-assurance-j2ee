@@ -10,8 +10,8 @@
   <tr><th>N°</th><th>Type</th><th>Début</th><th>Fin</th><th>Prime</th><th>Statut</th><th></th></tr>
   <c:forEach var="ct" items="${contrats}">
     <tr>
-      <td>${ct.numeroContrat}</td>
-      <td>${ct.typeAssurance.nom}</td>
+      <td><c:out value="${ct.numeroContrat}"/></td>
+      <td><c:out value="${ct.typeAssurance.nom}"/></td>
       <td>${ct.dateDebut}</td>
       <td>${empty ct.dateFin ? '—' : ct.dateFin}</td>
       <td>${ct.prime} €</td>

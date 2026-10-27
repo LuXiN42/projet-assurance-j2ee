@@ -8,7 +8,7 @@
 <h1>${edition ? 'Modifier le contrat '.concat(contrat.numeroContrat) : 'Nouveau contrat'}</h1>
 
 <c:if test="${not empty erreurs}">
-  <ul style="color:red"><c:forEach var="e" items="${erreurs}"><li>${e}</li></c:forEach></ul>
+  <ul style="color:red"><c:forEach var="e" items="${erreurs}"><li><c:out value="${e}"/></li></c:forEach></ul>
 </c:if>
 
 <form method="post">
@@ -16,12 +16,12 @@
 
   <c:if test="${not edition}">
     <p><label>N° contrat (laisser vide pour générer) :
-      <input name="numeroContrat" value="${param.numeroContrat}"></label></p>
+      <input name="numeroContrat" value="<c:out value='${param.numeroContrat}'/>"></label></p>
     <p><label>Client :
       <select name="clientId" required>
         <option value="">— choisir —</option>
         <c:forEach var="u" items="${clients}">
-          <option value="${u.id}" ${param.clientId == u.id ? 'selected' : ''}>${u.nom} ${u.prenom} — ${u.email}</option>
+          <option value="${u.id}" ${param.clientId == u.id ? 'selected' : ''}><c:out value="${u.nom}"/> <c:out value="${u.prenom}"/> — <c:out value="${u.email}"/></option>
         </c:forEach>
       </select></label></p>
   </c:if>
@@ -31,7 +31,7 @@
         <option value="">— choisir —</option>
         <c:forEach var="t" items="${types}">
         <c:set var="sel" value="${not empty param.typeId ? param.typeId == t.id : (edition && contrat.typeAssurance.id == t.id)}"/>
-        <option value="${t.id}" data-prix="${t.prixBase}" ${sel ? 'selected' : ''}>${t.nom} (${t.prixBase} €)</option>
+        <option value="${t.id}" data-prix="${t.prixBase}" ${sel ? 'selected' : ''}><c:out value="${t.nom}"/> (${t.prixBase} €)</option>
         </c:forEach>
     </select></label></p>
 
@@ -48,7 +48,7 @@
   <fieldset><legend>Garanties</legend>
     <c:forEach var="g" items="${garanties}">
       <label style="display:block">
-        <input type="checkbox" name="garantieIds" value="${g.id}" ${selIds.contains(g.id) ? 'checked' : ''}> ${g.nom}
+        <input type="checkbox" name="garantieIds" value="${g.id}" ${selIds.contains(g.id) ? 'checked' : ''}> <c:out value="${g.nom}"/>
       </label>
     </c:forEach>
   </fieldset>

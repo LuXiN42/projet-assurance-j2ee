@@ -12,7 +12,7 @@
     <table border="1" cellpadding="5">
       <tr><th>Date</th><th>Contrat</th><th>Montant</th></tr>
       <c:forEach var="p" items="${echeances}">
-        <tr><td>${p.date}</td><td>${p.contrat.numeroContrat}</td><td>${p.montant} €</td></tr>
+        <tr><td>${p.date}</td><td><c:out value="${p.contrat.numeroContrat}"/></td><td>${p.montant} €</td></tr>
       </c:forEach>
     </table>
   </c:otherwise>
@@ -25,7 +25,7 @@
     <table border="1" cellpadding="5">
       <tr><th>Date prévue</th><th>Contrat</th><th>Montant</th></tr>
       <c:forEach var="p" items="${enAttente}">
-        <tr><td>${p.date}</td><td>${p.contrat.numeroContrat}</td><td>${p.montant} €</td></tr>
+        <tr><td>${p.date}</td><td><c:out value="${p.contrat.numeroContrat}"/></td><td>${p.montant} €</td></tr>
       </c:forEach>
     </table>
   </c:otherwise>
@@ -38,7 +38,7 @@
     <table border="1" cellpadding="5">
       <tr><th>Date</th><th>Contrat</th><th>Montant</th><th>Mode</th></tr>
       <c:forEach var="p" items="${effectues}">
-        <tr><td>${p.date}</td><td>${p.contrat.numeroContrat}</td><td>${p.montant} €</td><td>${p.modePaiement}</td></tr>
+        <tr><td>${p.date}</td><td><c:out value="${p.contrat.numeroContrat}"/></td><td>${p.montant} €</td><td>${p.modePaiement}</td></tr>
       </c:forEach>
     </table>
   </c:otherwise>
@@ -48,7 +48,7 @@
 <table border="1" cellpadding="5">
   <tr><th>Date</th><th>Contrat</th><th>Montant</th><th>Mode</th><th>Statut</th></tr>
   <c:forEach var="p" items="${historique}">
-    <tr><td>${p.date}</td><td>${p.contrat.numeroContrat}</td><td>${p.montant} €</td>
+    <tr><td>${p.date}</td><td><c:out value="${p.contrat.numeroContrat}"/></td><td>${p.montant} €</td>
         <td>${p.modePaiement}</td><td>${p.statut}</td></tr>
   </c:forEach>
 </table>

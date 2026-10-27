@@ -1,17 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><title>Contrat ${contrat.numeroContrat}</title></head>
+<html lang="fr"><head><meta charset="UTF-8"><title>Contrat <c:out value="${contrat.numeroContrat}"/></title></head>
 <body>
 <p><a href="${ctx}/agent/contrats">← Liste des contrats</a></p>
-<h1>Contrat ${contrat.numeroContrat} — <em>${contrat.statut}</em></h1>
+<h1>Contrat <c:out value="${contrat.numeroContrat}"/> — <em>${contrat.statut}</em></h1>
 
-<c:if test="${not empty message}"><p style="color:green">${message}</p></c:if>
-<c:if test="${not empty erreur}"><p style="color:red">${erreur}</p></c:if>
+<c:if test="${not empty message}"><p style="color:green"><c:out value="${message}"/></p></c:if>
+<c:if test="${not empty erreur}"><p style="color:red"><c:out value="${erreur}"/></p></c:if>
 
 <table cellpadding="4">
-  <tr><th align="left">Client</th><td>${contrat.client.nom} ${contrat.client.prenom} (${contrat.client.email})</td></tr>
-  <tr><th align="left">Type</th><td>${contrat.typeAssurance.nom}</td></tr>
+  <tr><th align="left">Client</th><td><c:out value="${contrat.client.nom}"/> <c:out value="${contrat.client.prenom}"/> (<c:out value="${contrat.client.email}"/>)</td></tr>
+  <tr><th align="left">Type</th><td><c:out value="${contrat.typeAssurance.nom}"/></td></tr>
   <tr><th align="left">Période</th><td>${contrat.dateDebut} → ${empty contrat.dateFin ? 'indéterminée' : contrat.dateFin}</td></tr>
   <tr><th align="left">Prime</th><td>${contrat.prime} €</td></tr>
 </table>

@@ -7,7 +7,7 @@
 <p><a href="${pageContext.request.contextPath}/agent/accueil">← Accueil</a> |
    <a href="${pageContext.request.contextPath}/agent/contrats/form">+ Nouveau contrat</a></p>
 
-<c:if test="${not empty message}"><p style="color:green">${message}</p></c:if>
+<c:if test="${not empty message}"><p style="color:green"><c:out value="${message}"/></p></c:if>
 
 <c:if test="${not empty clientFiltre}">
   <p style="background:#eef;padding:6px">
@@ -17,12 +17,12 @@
 </c:if>
 
 <form method="get" action="${pageContext.request.contextPath}/agent/contrats">
-  <input name="numero" placeholder="N° contrat" value="${param.numero}">
-  <input name="nomClient" placeholder="Nom client" value="${param.nomClient}">
+  <input name="numero" placeholder="N° contrat" value="<c:out value='${param.numero}'/>">
+  <input name="nomClient" placeholder="Nom client" value="<c:out value='${param.nomClient}'/>">
   <select name="typeId">
     <option value="">— Type —</option>
     <c:forEach var="t" items="${types}">
-      <option value="${t.id}" ${param.typeId == t.id ? 'selected' : ''}>${t.nom}</option>
+      <option value="${t.id}" ${param.typeId == t.id ? 'selected' : ''}><c:out value="${t.nom}"/></option>
     </c:forEach>
   </select>
   <select name="statut">
@@ -38,9 +38,9 @@
   <tr><th>N°</th><th>Client</th><th>Type</th><th>Début</th><th>Fin</th><th>Prime</th><th>Statut</th><th></th></tr>
   <c:forEach var="ct" items="${contrats}">
     <tr>
-      <td>${ct.numeroContrat}</td>
-      <td>${ct.client.nom} ${ct.client.prenom}</td>
-      <td>${ct.typeAssurance.nom}</td>
+      <td><c:out value="${ct.numeroContrat}"/></td>
+      <td><c:out value="${ct.client.nom}"/> <c:out value="${ct.client.prenom}"/></td>
+      <td><c:out value="${ct.typeAssurance.nom}"/></td>
       <td>${ct.dateDebut}</td><td>${ct.dateFin}</td>
       <td>${ct.prime} €</td>
       <td>${ct.statut}</td>

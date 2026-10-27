@@ -8,7 +8,7 @@
 
 <c:if test="${param.inscrit == '1'}"><p style="color:green">Compte créé, vous pouvez vous connecter.</p></c:if>
 <c:if test="${param.deconnecte == '1'}"><p style="color:green">Vous êtes déconnecté.</p></c:if>
-<c:if test="${not empty erreur}"><p style="color:red">${erreur}</p></c:if>
+<c:if test="${not empty erreur}"><p style="color:red"><c:out value="${erreur}"/></p></c:if>
 
 <form method="post" action="${pageContext.request.contextPath}/login">
     <label>Email <input type="email" name="email" value="<c:out value='${param.email}'/>" required></label><br>

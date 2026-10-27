@@ -7,7 +7,7 @@
 <h1>Enregistrer un paiement</h1>
 
 <c:if test="${not empty erreurs}">
-  <ul style="color:red"><c:forEach var="e" items="${erreurs}"><li>${e}</li></c:forEach></ul>
+  <ul style="color:red"><c:forEach var="e" items="${erreurs}"><li><c:out value="${e}"/></li></c:forEach></ul>
 </c:if>
 
 <form method="post">
@@ -17,14 +17,14 @@
       <c:forEach var="ct" items="${contrats}">
         <c:set var="sel" value="${param.contratId == ct.id}"/>
         <option value="${ct.id}" data-prime="${ct.prime}" ${sel ? 'selected' : ''}>
-          ${ct.numeroContrat} — ${ct.client.nom} ${ct.client.prenom} (${ct.statut})
+          <c:out value="${ct.numeroContrat}"/> — <c:out value="${ct.client.nom}"/> <c:out value="${ct.client.prenom}"/> (${ct.statut})
         </option>
       </c:forEach>
     </select></label></p>
 
   <p><label>Montant (€) :
     <input type="number" step="0.01" min="0.01" name="montant" id="montant" required
-           value="${param.montant}"></label></p>
+           value="<c:out value='${param.montant}'/>"></label></p>
 
   <p><label>Date :
     <input type="date" name="date" value="${not empty param.date ? param.date : aujourdhui}"></label></p>
@@ -33,7 +33,7 @@
     <select name="mode">
       <option value="">—</option>
       <c:forEach var="m" items="${modes}">
-        <option value="${m}" ${param.mode == m ? 'selected' : ''}>${m}</option>
+        <option value="${m}" ${param.mode == m ? 'selected' : ''}><c:out value="${m}"/></option>
       </c:forEach>
     </select></label></p>
 

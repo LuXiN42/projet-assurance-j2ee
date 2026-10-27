@@ -25,8 +25,8 @@
   <c:forEach var="p" items="${paiements}">
     <tr>
       <td>${p.date}</td>
-      <td>${p.contrat.numeroContrat}</td>
-      <td>${p.contrat.client.nom} ${p.contrat.client.prenom}</td>
+      <td><c:out value="${p.contrat.numeroContrat}"/></td>
+      <td><c:out value="${p.contrat.client.nom}"/> <c:out value="${p.contrat.client.prenom}"/></td>
       <td>${p.montant} €</td>
       <td>${p.modePaiement}</td>
       <td>${p.statut}</td>
@@ -35,7 +35,7 @@
           <form method="post" action="${ctx}/agent/paiements/action" style="display:inline">
             <input type="hidden" name="id" value="${p.id}">
             <select name="mode">
-              <c:forEach var="m" items="${modes}"><option>${m}</option></c:forEach>
+              <c:forEach var="m" items="${modes}"><option><c:out value="${m}"/></option></c:forEach>
             </select>
             <button name="action" value="valider">Valider</button>
             <button name="action" value="echouer">Échec</button>

@@ -6,7 +6,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Détail du sinistre ${sinistre.numeroSinistre}</title>
+    <title>Détail du sinistre <c:out value="${sinistre.numeroSinistre}"/></title>
     <style>
         body { font-family: system-ui, sans-serif; margin: 2rem; color: #222; }
         h1, h2 { color: #1a3d6d; }
@@ -48,7 +48,7 @@
         <tr><th>Montant estimé</th>
             <td><c:out value="${s.montantEstime}"/> €</td></tr>
         <tr><th>Montant indemnisé</th>
-            <td><c:out value="${s.montantIndemnisation}"/> €</td></tr>
+            <td><c:choose><c:when test="${empty s.montantIndemnisation}">—</c:when><c:otherwise><c:out value="${s.montantIndemnisation}"/> €</c:otherwise></c:choose></td></tr>
         <tr><th>Contrat</th>
             <td><c:out value="${s.contrat.numeroContrat}"/></td></tr>
         <tr><th>Client</th>
@@ -83,7 +83,7 @@
 </div>
 
 <div class="carte">
-    <h2>Commentaires (${fn:length(s.commentaires)})</h2>
+    <h2>Commentaires (<c:out value="${fn:length(s.commentaires)}"/>)</h2>
     <c:choose>
         <c:when test="${empty s.commentaires}">
             <p>Aucun commentaire pour le moment.</p>
