@@ -339,6 +339,18 @@ ul.alerte { padding-left: 34px; }
 .bibi-page .bibi-fenetre { position: relative; right: auto; bottom: auto; display: flex; width: 100%; height: min(620px, calc(100vh - 230px)); z-index: 1; animation: none; }
 .bibi-page .bibi-bulle, .bibi-page [data-bibi="reduire"] { display: none; }
 
+/* ---------- pages d'erreur ---------- */
+.page-erreur { min-height: 82vh; display: grid; place-items: center; text-align: center; padding: 140px 24px 100px; }
+.page-erreur .code {
+    font-size: clamp(110px, 20vw, 200px); font-weight: 700; letter-spacing: -.06em; line-height: 1;
+    background: linear-gradient(135deg, #fff 20%, var(--violet-300)); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.page-erreur h1 { font-size: 36px; letter-spacing: -.03em; margin: 10px 0 8px; }
+.page-erreur p { margin: 0 auto 28px; max-width: 460px; }
+.page-erreur .boutons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.page-erreur .btn-leger { color: #fff; border: 1px solid rgba(255, 255, 255, .3); }
+.page-erreur .btn-leger:hover { background: rgba(255, 255, 255, .12); color: #fff; }
+
 /* ---------- pied de page ---------- */
 .pied { width: 100%; max-width: 1180px; margin: 40px auto 0; padding: 28px 24px 40px; border-top: 1px solid var(--ligne); display: flex; justify-content: space-between; align-items: center; color: var(--gris); font-size: 14px; }
 .pied .marque { font-size: 17px; }
