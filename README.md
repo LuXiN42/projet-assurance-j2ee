@@ -139,7 +139,9 @@ Bibi utilise l'API Gemini. Sans clé, toute l'application marche sauf Bibi, qui 
 
 ### 5. Compiler et déployer
 
-Compiler le projet :
+#### 5.1 Compiler le projet
+
+Depuis la racine du projet (le dossier qui contient le `pom.xml`) :
 
 ```bash
 mvn clean package
@@ -147,23 +149,27 @@ mvn clean package
 
 Le fichier produit est `target/assurance.war`.
 
-#### 5.1 Définir le chemin de Tomcat
+#### 5.2 Définir le chemin de Tomcat
 
 On appelle `TOMCAT_HOME` le dossier dans lequel Tomcat est installé (celui qui contient les dossiers `bin`, `webapps`, `logs`...). Par exemple : `/opt/tomcat`, `~/apache-tomcat-10.1.30` ou `C:\apache-tomcat-10.1.30`.
 
-- **Linux / Mac** (valable pour le terminal en cours) :
-  ```bash
-  export TOMCAT_HOME=~/apache-tomcat-10.1.30
-  ```
-  Pour que la variable soit conservée à chaque ouverture de terminal, ajouter cette même ligne `export` à la fin du fichier `~/.bashrc` (ou `~/.zshrc` sur Mac), puis exécuter `source ~/.bashrc`.
+**Linux / Mac** (valable pour le terminal en cours) :
 
-- **Windows (cmd)** (valable pour la fenêtre en cours) :
-  ```cmd
-  set CATALINA_HOME=C:\apache-tomcat-10.1.30
-  ```
-  Pour une variable permanente : Paramètres système avancés, Variables d'environnement, Nouvelle, nom `CATALINA_HOME`, valeur le chemin de Tomcat.
+```bash
+export TOMCAT_HOME=~/apache-tomcat-10.1.30
+```
 
-Vérification (Linux / Mac) :
+Pour conserver la variable à chaque ouverture de terminal, ajouter cette même ligne `export` à la fin du fichier `~/.bashrc` (ou `~/.zshrc` sur Mac), puis exécuter `source ~/.bashrc`.
+
+**Windows (cmd)** (valable pour la fenêtre en cours) :
+
+```cmd
+set CATALINA_HOME=C:\apache-tomcat-10.1.30
+```
+
+Pour une variable permanente : Paramètres système avancés, Variables d'environnement, Nouvelle, nom `CATALINA_HOME`, valeur le chemin de Tomcat.
+
+**Vérification** (Linux / Mac) :
 
 ```bash
 echo $TOMCAT_HOME
@@ -172,30 +178,68 @@ ls $TOMCAT_HOME/webapps
 
 La commande doit afficher le chemin de Tomcat puis le contenu de `webapps`. Sinon, le chemin est incorrect.
 
-Il est aussi possible de se passer de la variable en écrivant directement le chemin dans la commande :
+> Il est aussi possible de se passer de la variable en écrivant directement le chemin dans les commandes, par exemple `cp target/assurance.war ~/apache-tomcat-10.1.30/webapps/`.
+
+#### 5.3 Déployer et lancer l'application
+
+Depuis la racine du projet, après la compilation.
+
+**Linux / Mac**
 
 ```bash
-cp target/assurance.war ~/apache-tomcat-10.1.30/webapps/
+# 1. supprimer l'ancienne version si elle existe (redéploiement propre)
+rm -rf $TOMCAT_HOME/webapps/assurance $TOMCAT_HOME/webapps/assurance.war
+
+# 2. copier le nouveau war
+cp target/assurance.war $TOMCAT_HOME/webapps/
+
+# 3. démarrer Tomcat
+$TOMCAT_HOME/bin/startup.sh
 ```
 
-#### 5.2 Copier le war et démarrer Tomcat
+Si Linux répond « Permission denied » au démarrage, rendre les scripts exécutables (une seule fois) puis relancer l'étape 3 :
 
-- **Linux / Mac :**
-  ```bash
-  cp target/assurance.war $TOMCAT_HOME/webapps/
-  $TOMCAT_HOME/bin/startup.sh
-  ```
-- **Windows (cmd) :**
-  ```cmd
-  copy target\assurance.war %CATALINA_HOME%\webapps\
-  %CATALINA_HOME%\bin\startup.bat
-  ```
+```bash
+chmod +x $TOMCAT_HOME/bin/*.sh
+```
 
-Si le script `startup.sh` n'est pas exécutable, lancer une fois `chmod +x $TOMCAT_HOME/bin/*.sh`.
+**Windows (cmd)**
 
-Pour un redéploiement propre, supprimer l'ancien dossier `webapps/assurance/` et l'ancien fichier `webapps/assurance.war` avant de recopier le nouveau WAR. Les logs sont dans `logs/catalina.out`. Pour arrêter Tomcat, utiliser `shutdown.sh` (Linux / Mac) ou `shutdown.bat` (Windows), dans le dossier `bin` de Tomcat.
+```cmd
+rmdir /s /q %CATALINA_HOME%\webapps\assurance
+del %CATALINA_HOME%\webapps\assurance.war
+copy target\assurance.war %CATALINA_HOME%\webapps\
+%CATALINA_HOME%\bin\startup.bat
+```
 
-L'application est disponible sur <http://localhost:8080/assurance>.
+#### 5.4 Vérifier le démarrage
+
+Attendre quelques secondes le temps que Tomcat déploie le war. On peut suivre le déploiement dans les logs (Linux / Mac) :
+
+```bash
+tail -f $TOMCAT_HOME/logs/catalina.out
+```
+
+Le message `Server startup in [...] milliseconds` indique que Tomcat est prêt (quitter le suivi avec `Ctrl+C`).
+
+#### 5.5 Ouvrir l'application
+
+Aller sur <http://localhost:8080/assurance> dans le navigateur et se connecter avec un des comptes de test (voir la section « Comptes de test »).
+
+#### 5.6 Arrêter Tomcat
+
+```bash
+$TOMCAT_HOME/bin/shutdown.sh        # Linux / Mac
+%CATALINA_HOME%\bin\shutdown.bat    # Windows
+```
+
+#### 5.7 En cas de problème
+
+- **Page 404** : le war n'est pas déployé. Vérifier que le dossier `webapps/assurance/` a bien été créé par Tomcat et lire `logs/catalina.out`.
+- **Port 8080 déjà utilisé** : arrêter l'autre programme ou changer le port dans `conf/server.xml`.
+- **Erreur de connexion à la base** : vérifier que MySQL tourne et que les identifiants de `hibernate.cfg.xml` et `db.properties` correspondent à ceux créés à l'étape 3.
+- **L'application ne démarre pas avec Tomcat 9** : le projet utilise Jakarta, il faut Tomcat 10.1.
+
 ## Comptes de test
 
 Tous les comptes de test ont le mot de passe `Password123!`.
