@@ -36,12 +36,25 @@
     <nav>
         <a href="${pageContext.request.contextPath}/admin/utilisateurs">Utilisateurs</a>
         <a href="${pageContext.request.contextPath}/admin/types">Types d'assurance</a>
-        <a href="${pageContext.request.contextPath}/admin/contrats">Contrats</a>
-        <a href="${pageContext.request.contextPath}/admin/sinistres">Sinistres</a>
+        <a href="${pageContext.request.contextPath}/agent/contrats">Contrats</a>
+        <a href="${pageContext.request.contextPath}/agent/sinistres">Sinistres</a>
         <a href="${pageContext.request.contextPath}/admin/statistiques">Statistiques</a>
     </nav>
 </header>
 <main>
+
+    <section class="chart-card">
+        <h2 style="margin-top:0">Analyse par l'IA</h2>
+        <c:if test="${not empty erreurIA}">
+            <p style="color:var(--d)"><c:out value="${erreurIA}"/></p>
+        </c:if>
+        <c:if test="${not empty analyseIA}">
+            <p style="white-space:pre-wrap"><c:out value="${analyseIA}"/></p>
+        </c:if>
+        <form method="post" action="${pageContext.request.contextPath}/admin/statistiques">
+            <button type="submit">Analyser les chiffres avec l'IA</button>
+        </form>
+    </section>
 
     <!-- Vue d'ensemble utilisateurs -->
     <section>

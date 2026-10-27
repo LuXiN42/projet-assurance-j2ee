@@ -1,19 +1,29 @@
 package com.assurance.controller.admin;
 
-import com.assurance.dao.StatistiquesDao;
-import com.assurance.util.JdbcUtil;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.assurance.dao.StatistiquesDao;
+import com.assurance.service.AssistantIAService;
+import com.assurance.service.BusinessException;
+import com.assurance.util.JdbcUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Tableau de bord statistiques (T28) — version ADMIN.
@@ -24,11 +34,19 @@ public class StatistiquesAdminServlet extends HttpServlet {
     private static final String VUE = "/WEB-INF/views/admin/statistiques.jsp";
 
     private final StatistiquesDao dao = new StatistiquesDao();
+    private final AssistantIAService assistant = new AssistantIAService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
+
+        // l'analyse IA n'est affichée qu'une fois
+        HttpSession session = req.getSession();
+        req.setAttribute("analyseIA", session.getAttribute("analyseIA"));
+        req.setAttribute("erreurIA", session.getAttribute("erreurIA"));
+        session.removeAttribute("analyseIA");
+        session.removeAttribute("erreurIA");
 
         // -------- KPI : Clients --------
         long totalClients   = dao.countClients();
@@ -105,6 +123,55 @@ public class StatistiquesAdminServlet extends HttpServlet {
         req.setAttribute("sinistresStatutDataJson",   toJsonArrayRowsLong(sinistresParStatut, "total"));
 
         req.getRequestDispatcher(VUE).forward(req, resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session = req.getSession();
+        try {
+            List<String[]> question = new ArrayList<>();
+            question.add(new String[] { "user",
+                    "Analyse ces chiffres en 5 à 8 phrases : les points forts, "
+                    + "les points à surveiller et une ou deux recommandations." });
+            session.setAttribute("analyseIA", assistant.repondre(consignesAnalyse(), question));
+        } catch (BusinessException e) {
+            session.setAttribute("erreurIA", e.getMessage());
+        }
+        resp.sendRedirect(req.getContextPath() + "/admin/statistiques");
+    }
+
+    private String consignesAnalyse() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Tu es un analyste dans une compagnie d'assurance. ");
+        sb.append("Tu réponds en français, en texte simple sans mise en forme (pas de gras, pas de titres), ");
+        sb.append("de façon courte et claire. Tu t'appuies uniquement sur les chiffres ci-dessous, sans en inventer.\n\n");
+
+        sb.append("Clients : ").append(dao.countClients()).append(" au total, ")
+          .append(dao.countNewClients(30)).append(" nouveaux sur les 30 derniers jours.\n");
+
+        sb.append("Contrats : ").append(dao.countContratsParStatut("ACTIF")).append(" actifs, ")
+          .append(dao.countContratsParStatut("EN_ATTENTE")).append(" en attente, ")
+          .append(dao.countContratsParStatut("SUSPENDU")).append(" suspendus, ")
+          .append(dao.countContratsParStatut("EXPIRE")).append(" expirés, ")
+          .append(dao.countContratsParStatut("RESILIE")).append(" résiliés.\n");
+
+        sb.append("Chiffre d'affaires encaissé : ").append(dao.caEncaisse()).append(" €\n");
+        sb.append("Primes des contrats actifs : ").append(dao.primesContratsActifs()).append(" €\n");
+        sb.append("Indemnisations versées : ").append(dao.totalIndemnisations()).append(" €\n");
+        sb.append("Taux de sinistralité : ").append(dao.tauxSinistralite()).append(" %\n");
+        sb.append("Paiements en attente : ").append(countPaiementsByStatut("EN_ATTENTE")).append("\n");
+
+        sb.append("Sinistres par statut : ");
+        for (Map<String, Object> r : dao.repartitionSinistres()) {
+            sb.append(r.get("statut")).append(" = ").append(r.get("nb")).append(", ");
+        }
+        sb.append("\nClients par type d'assurance : ");
+        for (Map<String, Object> r : dao.clientsParTypeAssurance()) {
+            sb.append(r.get("type")).append(" = ").append(r.get("nb_clients")).append(", ");
+        }
+        sb.append("\nContrats créés par mois : ").append(dao.evolutionContrats12());
+        sb.append("\nPaiements encaissés par mois : ").append(dao.evolutionPaiements12());
+        return sb.toString();
     }
 
     // ========================================================================
